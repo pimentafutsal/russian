@@ -1,0 +1,1955 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Русский с нуля — Russo do Zero</title>
+<style>
+  :root{
+    --bg:#0f1226; --bg2:#161a3a; --card:#1c2150; --card2:#232a63;
+    --ink:#eef1ff; --muted:#9aa3d4; --line:#2c3475;
+    --accent:#6c8cff; --accent2:#a06bff; --good:#37d99a; --warn:#ffcf5c; --bad:#ff6b8a;
+    --ru:#ffd54a; --shadow:0 12px 40px rgba(0,0,0,.45);
+    --radius:20px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 800px at 15% -10%,#243070 0%,transparent 55%),
+               radial-gradient(1000px 700px at 110% 10%,#4a2a7a 0%,transparent 50%),
+               var(--bg);
+    color:var(--ink); min-height:100vh; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:18px 16px 120px}
+  .top{display:flex;align-items:center;gap:14px;justify-content:space-between;margin:6px 0 18px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:grid;place-items:center;font-weight:800;font-size:22px;color:#fff;box-shadow:var(--shadow)}
+  .brand h1{font-size:18px;margin:0;line-height:1.1}
+  .brand small{color:var(--muted);font-size:12px}
+  .stats{display:flex;gap:10px;flex-wrap:wrap}
+  .pill{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:7px 13px;
+    font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px}
+  .pill b{color:var(--ru)}
+  .coach{background:linear-gradient(120deg,rgba(108,140,255,.16),rgba(160,107,255,.16));
+    border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin-bottom:18px;
+    display:flex;gap:12px;align-items:flex-start}
+  .coach .k{font-size:26px;line-height:1}
+  .coach p{margin:0;font-size:14px;color:var(--ink)}
+  .coach small{color:var(--muted)}
+  .overall{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin-bottom:8px}
+  .overall .row{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);margin-bottom:8px}
+  .overall .bar{height:10px;background:#0c0f28;border-radius:999px;overflow:hidden}
+  .overall .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--good),var(--accent),var(--accent2));width:0;transition:.4s}
+  h2.section{font-size:15px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin:26px 6px 6px}
+  .unit-sub{margin:0 6px 12px;color:#c8d0ff;font-size:13px}
+  .levels{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+  .lvl{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;
+    cursor:pointer;transition:.18s transform,.18s box-shadow,.18s border-color;position:relative;overflow:hidden}
+  .lvl:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--accent)}
+  .lvl .num{font-size:12px;color:var(--muted);font-weight:700}
+  .lvl .t{font-size:16px;font-weight:800;margin:4px 0 2px}
+  .lvl .ru{color:var(--ru);font-size:14px;margin-bottom:10px}
+  .lvl .bar{height:8px;background:#0c0f28;border-radius:999px;overflow:hidden}
+  .lvl .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--good),var(--accent));width:0}
+  .lvl .meta{display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--muted)}
+  .lvl.locked{opacity:.5;filter:grayscale(.4);cursor:not-allowed}
+  .lvl .lock{position:absolute;top:14px;right:14px;font-size:16px}
+  .lvl .done{position:absolute;top:12px;right:12px;background:var(--good);color:#04231a;font-weight:800;
+    border-radius:999px;padding:2px 9px;font-size:11px}
+  .btn{appearance:none;border:none;cursor:pointer;font-family:inherit;font-weight:700;border-radius:14px;
+    padding:12px 18px;font-size:15px;transition:.15s transform,.15s filter}
+  .btn:active{transform:scale(.97)}
+  .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+  .btn.ghost{background:var(--card2);color:var(--ink);border:1px solid var(--line)}
+  .btn.good{background:linear-gradient(135deg,var(--good),#27b07f);color:#04231a}
+  .btn.wide{width:100%}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .screen{position:fixed;inset:0;background:var(--bg);z-index:50;overflow-y:auto;display:none}
+  .screen.open{display:block}
+  .screen .wrap{padding-top:14px}
+  .lhead{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .lhead .back{background:var(--card);border:1px solid var(--line);border-radius:12px;width:44px;height:44px;
+    display:grid;place-items:center;cursor:pointer;font-size:20px}
+  .lhead h2{margin:0;font-size:19px}
+  .lhead .ru{color:var(--ru);font-size:14px}
+  .tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+  .tab{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:9px 15px;font-size:13px;
+    font-weight:700;cursor:pointer;color:var(--muted)}
+  .tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent}
+  .panel{display:none}
+  .panel.active{display:block}
+  .wcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:14px;
+    display:flex;align-items:center;gap:16px}
+  .wcard .emoji{font-size:38px;width:52px;text-align:center}
+  .wcard .body{flex:1;min-width:0}
+  .wcard .cyr{font-size:28px;font-weight:800;color:var(--ru);line-height:1.1}
+  .wcard .tr{color:var(--muted);font-size:14px;font-style:italic;margin-top:2px}
+  .wcard .pt{font-size:16px;margin-top:4px}
+  .wcard .mn{margin-top:8px;font-size:13px;color:#c8d0ff;background:rgba(108,140,255,.12);
+    border-left:3px solid var(--accent);padding:6px 10px;border-radius:8px}
+  .speak{background:var(--card2);border:1px solid var(--line);border-radius:14px;width:52px;height:52px;
+    display:grid;place-items:center;cursor:pointer;font-size:22px;flex-shrink:0}
+  .speak:hover{border-color:var(--accent)}
+  .speak.playing{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;animation:pulse 1s infinite}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+  .quizbox{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:24px;text-align:center}
+  .quizbox .prompt{font-size:32px;font-weight:800;color:var(--ru);margin:6px 0 4px;min-height:42px}
+  .quizbox .sub{color:var(--muted);margin-bottom:18px;font-size:14px}
+  .opts{display:grid;gap:10px;grid-template-columns:1fr 1fr}
+  .opt{background:var(--card2);border:2px solid var(--line);border-radius:14px;padding:16px;cursor:pointer;
+    font-size:16px;font-weight:700;transition:.12s}
+  .opt:hover{border-color:var(--accent)}
+  .opt.correct{border-color:var(--good);background:rgba(55,217,154,.18)}
+  .opt.wrong{border-color:var(--bad);background:rgba(255,107,138,.16)}
+  .progressline{height:10px;background:#0c0f28;border-radius:999px;overflow:hidden;margin:14px 0 4px}
+  .progressline i{display:block;height:100%;background:linear-gradient(90deg,var(--good),var(--accent));transition:.3s}
+  .mic{width:120px;height:120px;border-radius:50%;border:none;cursor:pointer;margin:10px auto;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:44px;box-shadow:var(--shadow)}
+  .mic.rec{animation:pulse .9s infinite;background:linear-gradient(135deg,var(--bad),#d43d63)}
+  .heard{margin-top:14px;font-size:15px;min-height:24px;color:var(--muted)}
+  .chat{display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
+  .msg{max-width:82%;padding:12px 15px;border-radius:16px;font-size:15px;line-height:1.4}
+  .msg .cyr{font-weight:800;color:var(--ru);font-size:17px}
+  .msg .tr{font-size:12px;color:var(--muted);font-style:italic;margin-top:2px}
+  .msg .pt{font-size:13px;margin-top:3px}
+  .msg.them{background:var(--card);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+  .msg.me{background:linear-gradient(135deg,rgba(108,140,255,.25),rgba(160,107,255,.25));border:1px solid var(--line);
+    align-self:flex-end;border-bottom-right-radius:4px}
+  .replies{display:flex;flex-direction:column;gap:8px}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(140px);z-index:80;
+    background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 22px;font-weight:800;
+    box-shadow:var(--shadow);transition:.3s;text-align:center;max-width:90%}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .toast.good{border-color:var(--good);color:var(--good)}
+  .toast.bad{border-color:var(--bad);color:var(--bad)}
+  .complete{text-align:center;padding:40px 20px}
+  .complete .big{font-size:60px}
+  .complete h3{font-size:24px;margin:10px 0 4px}
+  .footer-note{color:var(--muted);font-size:12px;text-align:center;margin-top:30px;line-height:1.6}
+  .anchor-tip{background:rgba(255,207,92,.1);border:1px solid rgba(255,207,92,.35);border-radius:14px;
+    padding:12px 14px;font-size:13px;color:#ffe6a3;margin-bottom:10px;line-height:1.5}
+  .note-tip{background:rgba(108,140,255,.12);border:1px solid var(--line);border-radius:14px;
+    padding:12px 14px;font-size:13px;color:#cdd6ff;margin-bottom:16px;line-height:1.5}
+  @media(max-width:520px){.opts{grid-template-columns:1fr}.wcard .cyr{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">
+      <div class="logo">Я</div>
+      <div>
+        <h1>Русский с нуля</h1>
+        <small>Russo do Zero · ler · ouvir · falar · conversar</small>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="pill">🔥 <b id="stStreak">0</b>&nbsp;dias</div>
+      <div class="pill">⭐ <b id="stXP">0</b>&nbsp;XP</div>
+      <div class="pill">🎯 Nível <b id="stLevel">1</b></div>
+    </div>
+  </div>
+
+  <div class="coach">
+    <div class="k">🧠</div>
+    <div>
+      <p id="coachMsg">Bem-vindo, Lucas. Respire fundo e sorria — seu cérebro aprende melhor em estado positivo. Vamos do zero, um passo de cada vez.</p>
+      <small id="coachTip">Dica PNL: antes de começar, imagine-se já falando russo com confiança. Essa visualização prepara sua mente.</small>
+    </div>
+  </div>
+
+  <div class="overall">
+    <div class="row"><span>Progresso total do curso</span><span id="ovTxt">0 / 24 níveis</span></div>
+    <div class="bar"><i id="ovBar"></i></div>
+  </div>
+
+  <div class="overall" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+    <div style="font-size:13px"><b>☁️ Sincronização</b><div id="syncStatus" style="color:var(--muted);margin-top:2px">Verificando...</div></div>
+    <div id="syncBtns" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+  </div>
+
+  <div style="text-align:center;margin:10px 0 4px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+    <button class="btn ghost" onclick="runAudioTest()">🔊 Testar áudio</button>
+    <button class="btn ghost" onclick="testMic()">🎤 Testar microfone</button>
+  </div>
+  <div id="audioResult" style="display:none;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:14px;font-size:13px;line-height:1.65"></div>
+
+  <div id="levelMap"></div>
+
+  <div class="footer-note">
+    Áudio nativo do navegador (russo). Para melhor experiência, use Chrome ou Edge no computador.<br>
+    Toque em 🔊 para ouvir · 🎤 para praticar sua voz. Seu progresso é salvo automaticamente neste dispositivo.
+  </div>
+</div>
+
+<!-- LESSON SCREEN -->
+<div class="screen" id="lessonScreen">
+  <div class="wrap">
+    <div class="lhead">
+      <div class="back" onclick="closeLesson()">←</div>
+      <div>
+        <h2 id="lTitle">Título</h2>
+        <div class="ru" id="lRu">—</div>
+      </div>
+    </div>
+    <div class="anchor-tip" id="anchorTip"></div>
+    <div class="note-tip" id="noteTip" style="display:none"></div>
+    <div class="tabs">
+      <div class="tab active" data-tab="learn" onclick="switchTab('learn')">📖 Aprender</div>
+      <div class="tab" data-tab="listen" onclick="switchTab('listen')">👂 Ouvir</div>
+      <div class="tab" data-tab="speak" onclick="switchTab('speak')">🎤 Falar</div>
+      <div class="tab" data-tab="review" onclick="switchTab('review')">🔁 Revisar</div>
+    </div>
+    <div class="panel active" id="panel-learn"></div>
+    <div class="panel" id="panel-listen"></div>
+    <div class="panel" id="panel-speak"></div>
+    <div class="panel" id="panel-review"></div>
+  </div>
+</div>
+
+<!-- CONVERSATION SCREEN -->
+<div class="screen" id="convScreen">
+  <div class="wrap">
+    <div class="lhead">
+      <div class="back" onclick="closeConv()">←</div>
+      <div>
+        <h2 id="cTitle">Conversação</h2>
+        <div class="ru">Диалог</div>
+      </div>
+    </div>
+    <div class="chat" id="chatBox"></div>
+    <div class="replies" id="replyBox"></div>
+  </div>
+</div>
+
+<!-- READING SCREEN -->
+<div class="screen" id="readScreen">
+  <div class="wrap">
+    <div class="lhead">
+      <div class="back" onclick="closeRead()">←</div>
+      <div><h2 id="rTitle">Leitura</h2><div class="ru" id="rRu">Чтение</div></div>
+    </div>
+    <div class="note-tip">💡 Dica: leia primeiro <b>sem tradução</b> tentando entender pelo contexto. Depois toque em "Mostrar tradução" para conferir.</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      <button class="btn primary" onclick="playAllRead()">🔊 Ouvir tudo</button>
+      <button class="btn ghost" id="rToggle" onclick="toggleReadPt()">👁️ Mostrar tradução</button>
+    </div>
+    <div id="readBox"></div>
+    <div id="readFoot"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script>
+/* ============================================================
+   SINCRONIZAÇÃO NA NUVEM (Firebase) — opcional
+   👉 Cole aqui a config do SEU projeto Firebase (veja instruções).
+      Enquanto estiver "COLE_AQUI", o app funciona só neste aparelho.
+   ============================================================ */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyB9ENebeyhsP8-68mpecg0YshK5NK-P57Y",
+  authDomain: "apprussian-language.firebaseapp.com",
+  projectId: "apprussian-language",
+  storageBucket: "apprussian-language.firebasestorage.app",
+  messagingSenderId: "666974354128",
+  appId: "1:666974354128:web:51c3abbc2d9742ab477cd5"
+};
+var fbUser=null, db=null, cloudReady=false, cloudTimer=null;
+function mergeStates(a,b){
+  a=a||{}; b=b||{};
+  return {
+    xp: Math.max(a.xp||0, b.xp||0),
+    streak: Math.max(a.streak||0, b.streak||0),
+    lastDay: ((a.lastDay||'')>(b.lastDay||'') ? a.lastDay : b.lastDay) || new Date().toISOString().slice(0,10),
+    completed: Object.assign({}, a.completed, b.completed),
+    convDone: Object.assign({}, a.convDone, b.convDone),
+    readDone: Object.assign({}, a.readDone, b.readDone)
+  };
+}
+function saveCloud(){
+  if(!fbUser||!db) return;
+  clearTimeout(cloudTimer);
+  cloudTimer=setTimeout(function(){
+    db.collection('users').doc(fbUser.uid).set({state:state, updatedAt:Date.now()},{merge:true}).catch(function(){});
+  },800);
+}
+function initFirebase(){
+  var ok = window.firebase && FIREBASE_CONFIG && String(FIREBASE_CONFIG.apiKey).indexOf('COLE_AQUI')===-1;
+  if(!ok){ updateSyncUI(null); return; }
+  try{
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db=firebase.firestore();
+    cloudReady=true;
+    firebase.auth().onAuthStateChanged(function(user){
+      fbUser=user;
+      if(user){
+        db.collection('users').doc(user.uid).get().then(function(snap){
+          var cloud = snap.exists ? (snap.data().state||{}) : {};
+          state=mergeStates(state, cloud);
+          save(); renderMap();
+        }).catch(function(){ renderMap(); });
+      }
+      updateSyncUI(user);
+    });
+  }catch(e){ cloudReady=false; updateSyncUI(null); }
+}
+function updateSyncUI(user){
+  var stt=document.getElementById('syncStatus'), btns=document.getElementById('syncBtns');
+  if(!stt||!btns) return;
+  if(!cloudReady){
+    stt.textContent='Não configurado — progresso salvo só neste aparelho.';
+    btns.innerHTML='<button class="btn ghost" onclick="showSyncHelp()">Como ativar</button>';
+    return;
+  }
+  if(user){
+    stt.innerHTML='Conectado: <b>'+(user.email||'conta Google')+'</b> · sincronizado ☁️✓';
+    btns.innerHTML='<button class="btn ghost" onclick="syncSignOut()">Sair</button>';
+  } else {
+    stt.textContent='Entre para sincronizar entre iPad e notebook.';
+    btns.innerHTML='<button class="btn primary" onclick="syncSignInEmail()">Entrar</button>';
+  }
+}
+function syncSignInGoogle(){
+  if(!cloudReady){ showSyncHelp(); return; }
+  var p=new firebase.auth.GoogleAuthProvider();
+  firebase.auth().signInWithPopup(p).catch(function(e){ toast('Erro: '+(e.message||e.code),'bad'); });
+}
+function syncSignInEmail(){
+  if(!cloudReady){ showSyncHelp(); return; }
+  var email=prompt('Seu e-mail:'); if(!email) return;
+  var pass=prompt('Sua senha:'); if(!pass) return;
+  firebase.auth().signInWithEmailAndPassword(email,pass).catch(function(e){
+    if(e.code==='auth/user-not-found' || e.code==='auth/invalid-credential' || e.code==='auth/wrong-password'){
+      toast('Acesso não autorizado. Crie a conta no Firebase primeiro.','bad');
+    } else { toast(e.message,'bad'); }
+  });
+}
+function syncSignOut(){ if(window.firebase) firebase.auth().signOut(); }
+function showSyncHelp(){ alert('Para sincronizar entre aparelhos:\n\n1) Crie um projeto gratis em firebase.google.com\n2) Ative Authentication (E-mail/senha e Google) e o Firestore Database\n3) Copie a config (engrenagem > Project settings) e cole no topo do arquivo, em FIREBASE_CONFIG\n4) Publique no GitHub Pages e faca login nos dois aparelhos\n\nPeca ao Claude o passo a passo detalhado.'); }
+</script>
+<script>
+/* ============================================================
+   RUSSO DO ZERO — currículo completo (24 níveis, 5 unidades)
+   Campos: cyr, tr (transliteração), pt, mn (mnemônico/PNL), e (emoji)
+   ============================================================ */
+const UNITS = [
+  {id:"A", name:"Азбука · O Alfabeto", sub:"As 33 letras do cirílico — a base de tudo.", range:[0,4]},
+  {id:"B", name:"Первые слова · Primeiras Palavras", sub:"Cumprimentar, se apresentar e ser educado.", range:[5,7]},
+  {id:"C", name:"Основы · Fundamentos", sub:"Números, família, cores e tempo.", range:[8,12]},
+  {id:"D", name:"Каждый день · Vida Cotidiana", sub:"Comer, comprar, se locomover, viajar.", range:[13,18]},
+  {id:"E", name:"Общение · Comunicação", sub:"Verbos, perguntas, saúde, trabalho e conversação real.", range:[19,23]}
+];
+
+const LEVELS = [
+  /* ===== UNIDADE A — ALFABETO ===== */
+  { id:0, unit:"A", title:"Alfabeto 1 — as fáceis", ru:"Алфавит I", emoji:"🔤",
+    intro:"Comece pelas letras que se parecem com o português. Seu cérebro adora o familiar.",
+    words:[
+      {cyr:"А а", tr:"a (de 'casa')", pt:"letra A", mn:"Igual ao nosso A. Uma montanha 'A'.", e:"🅰️"},
+      {cyr:"О о", tr:"o (de 'bola')", pt:"letra O", mn:"Um círculo, uma bola O.", e:"⚽"},
+      {cyr:"К к", tr:"k", pt:"letra K", mn:"Mesmo K de 'kilo'.", e:"🔑"},
+      {cyr:"М м", tr:"m", pt:"letra M", mn:"Duas montanhas: M.", e:"⛰️"},
+      {cyr:"Т т", tr:"t", pt:"letra T", mn:"Um martelo 'T'.", e:"🔨"},
+      {cyr:"Е е", tr:"ye (soa 'ié')", pt:"letra E", mn:"Parece E, soa 'ié'.", e:"📧"}
+    ]},
+  { id:1, unit:"A", title:"Alfabeto 2 — falsas amigas", ru:"Алфавит II", emoji:"🎭",
+    intro:"Parecem letras latinas, mas soam diferente. Observe com curiosidade, não com medo.",
+    note:"Estas são as pegadinhas mais comuns: В=V, Н=N, Р=R, С=S, У=U, Х=RR. Marque-as bem.",
+    words:[
+      {cyr:"В в", tr:"v", pt:"soa como V", mn:"Parece B, é V de 'vitória'.", e:"✌️"},
+      {cyr:"Н н", tr:"n", pt:"soa como N", mn:"Parece H, é N de 'não'.", e:"🚫"},
+      {cyr:"Р р", tr:"r (vibrado)", pt:"soa como R", mn:"Parece P, é R de 'Roma' vibrado.", e:"🌀"},
+      {cyr:"С с", tr:"s", pt:"soa como S", mn:"Parece C, é S de 'sol'.", e:"☀️"},
+      {cyr:"У у", tr:"u", pt:"soa como U", mn:"Parece Y, é U de 'lua'.", e:"🌙"},
+      {cyr:"Х х", tr:"kh (rr aspirado)", pt:"soa como RR", mn:"Som de 'rr' raspado na garganta.", e:"💨"}
+    ]},
+  { id:2, unit:"A", title:"Alfabeto 3 — consoantes novas", ru:"Алфавит III", emoji:"🆕",
+    intro:"Novas formas, sons diretos. Diga cada uma em voz alta ao ouvir.",
+    words:[
+      {cyr:"Б б", tr:"b", pt:"soa como B", mn:"Parece um '6', é B de 'bola'.", e:"⚽"},
+      {cyr:"Г г", tr:"g (de 'gato')", pt:"soa como G", mn:"Um cano de gás 'g'.", e:"🔧"},
+      {cyr:"Д д", tr:"d", pt:"soa como D", mn:"Uma casinha com base = D.", e:"🏠"},
+      {cyr:"З з", tr:"z", pt:"soa como Z", mn:"Parece um 3, é Z de 'zoo'.", e:"🦓"},
+      {cyr:"Л л", tr:"l", pt:"soa como L", mn:"Uma barraca 'Л' = L.", e:"⛺"},
+      {cyr:"П п", tr:"p", pt:"soa como P", mn:"Um portal 'П' = P.", e:"🚪"},
+      {cyr:"Ф ф", tr:"f", pt:"soa como F", mn:"Um globo = F de 'foto'.", e:"🌐"}
+    ]},
+  { id:3, unit:"A", title:"Alfabeto 4 — sons 'ch/sh'", ru:"Алфавит IV", emoji:"🔊",
+    intro:"Os sons sibilantes do russo. São o tempero da língua.",
+    words:[
+      {cyr:"Ж ж", tr:"zh (j de 'jour')", pt:"som 'J' francês", mn:"Um besouro 'Ж' zumbindo: jjj.", e:"🪲"},
+      {cyr:"Ч ч", tr:"ch (tch)", pt:"som 'TCH'", mn:"Uma cadeira '4' = TCH de 'tchau'.", e:"💺"},
+      {cyr:"Ш ш", tr:"sh (ch de 'chá')", pt:"som 'CH'", mn:"Um pente 'Ш' = shhh.", e:"🪮"},
+      {cyr:"Щ щ", tr:"shch (ch longo)", pt:"'CH' mais suave/longo", mn:"É o Ш com rabinho: mais alongado.", e:"〰️"},
+      {cyr:"Ц ц", tr:"ts", pt:"som 'TS'", mn:"'TS' como em 'tsé-tsé'.", e:"🪰"},
+      {cyr:"Й й", tr:"y (i curto)", pt:"'i' curtinho", mn:"É o И com um chapéu — som de 'i' rápido.", e:"🎩"},
+      {cyr:"И и", tr:"i (de 'vida')", pt:"letra I", mn:"Parece N ao contrário, soa 'i'.", e:"ℹ️"}
+    ]},
+  { id:4, unit:"A", title:"Alfabeto 5 — vogais iotadas & sinais", ru:"Алфавит V", emoji:"🎯",
+    intro:"As últimas letras. Ao dominá-las, você lê QUALQUER palavra russa.",
+    note:"Ь (sinal suave) amolece a consoante anterior; Ъ (sinal duro) separa. Nenhum dos dois tem som próprio.",
+    words:[
+      {cyr:"Я я", tr:"ya", pt:"'IÁ' / também = eu", mn:"Parece R invertido — som 'iá'.", e:"🙋"},
+      {cyr:"Ю ю", tr:"yu", pt:"'IU'", mn:"Um 'O' com haste = 'iu'.", e:"🎈"},
+      {cyr:"Ё ё", tr:"yo", pt:"'IÔ'", mn:"É o Е com dois pontinhos = 'iô'.", e:"🌟"},
+      {cyr:"Э э", tr:"e (aberto, 'é')", pt:"'É' aberto", mn:"Um E ao contrário = 'é' de 'pé'.", e:"🔙"},
+      {cyr:"Ы ы", tr:"y (gutural)", pt:"som entre i e u", mn:"Som gutural — sorria e diga 'i' preso.", e:"😬"},
+      {cyr:"Ь ь", tr:"(sinal suave)", pt:"amolece a letra", mn:"Sem som — deixa a consoante 'molinha'.", e:"🫧"},
+      {cyr:"Ъ ъ", tr:"(sinal duro)", pt:"separa sons", mn:"Sem som — dá uma pausinha dura.", e:"🧱"}
+    ]},
+
+  /* ===== UNIDADE B — PRIMEIRAS PALAVRAS ===== */
+  { id:5, unit:"B", title:"Saudações", ru:"Приветствия", emoji:"👋",
+    intro:"Suas primeiras palavras REAIS. Diga em voz alta e sinta o poder de se comunicar.",
+    words:[
+      {cyr:"Привет", tr:"privét", pt:"Oi (informal)", mn:"'Privê' — uma festa privê de amigos.", e:"👋"},
+      {cyr:"Здравствуйте", tr:"zdrávstvuyte", pt:"Olá (formal)", mn:"Parece um espirro elegante e formal.", e:"🤝"},
+      {cyr:"Доброе утро", tr:"dóbroye útra", pt:"Bom dia", mn:"'Dobro' = bom; 'utra' = manhã.", e:"🌅"},
+      {cyr:"Добрый день", tr:"dóbryy den", pt:"Boa tarde", mn:"'Den' = dia.", e:"☀️"},
+      {cyr:"Добрый вечер", tr:"dóbryy vécher", pt:"Boa noite (chegada)", mn:"'Vecher' = noitinha.", e:"🌆"},
+      {cyr:"Пока", tr:"paká", pt:"Tchau", mn:"'Paká' — vou 'pra cá' e sumo.", e:"👋"},
+      {cyr:"До свидания", tr:"da svidániya", pt:"Até logo (formal)", mn:"'Svidania' — até a próxima vista.", e:"🚪"}
+    ]},
+  { id:6, unit:"B", title:"Eu e Você — apresentação", ru:"Я и ты", emoji:"🧑",
+    intro:"Fale sobre si mesmo. Repita 'Меня зовут Лукас' até soar natural.",
+    note:"Вы é formal/plural; Ты é informal. Com estranhos e mais velhos, use sempre Вы.",
+    words:[
+      {cyr:"Я", tr:"ya", pt:"Eu", mn:"'Ya' — é o logo do app! Você = Я.", e:"🙋"},
+      {cyr:"Ты", tr:"ty", pt:"Você (informal)", mn:"'Ty' — aponta pra 'ti'.", e:"👉"},
+      {cyr:"Вы", tr:"vy", pt:"Você (formal) / Vocês", mn:"'Vy' — respeito, o 'vós'.", e:"🎩"},
+      {cyr:"Меня зовут…", tr:"minyá zavút", pt:"Meu nome é…", mn:"'Minha' identidade é chamada.", e:"📛"},
+      {cyr:"Как вас зовут?", tr:"kak vas zavút", pt:"Como se chama? (formal)", mn:"'Kak vas zovut' — como te chamam?", e:"❓"},
+      {cyr:"Очень приятно", tr:"óchin priyátna", pt:"Muito prazer", mn:"'Ochin priyatna' — muito agradável.", e:"😊"},
+      {cyr:"Я из Бразилии", tr:"ya iz Brazílii", pt:"Sou do Brasil", mn:"'Iz Brazilii' — vindo do Brasil.", e:"🇧🇷"}
+    ]},
+  { id:7, unit:"B", title:"Cortesia & Sobrevivência", ru:"Вежливость", emoji:"🙏",
+    intro:"Frases que resolvem o dia. Cada uma dominada é uma pequena vitória — comemore.",
+    words:[
+      {cyr:"Да", tr:"da", pt:"Sim", mn:"'Da' — dá! pode dar.", e:"✅"},
+      {cyr:"Нет", tr:"nyet", pt:"Não", mn:"'Niét' — nega tudo.", e:"❌"},
+      {cyr:"Спасибо", tr:"spassíba", pt:"Obrigado(a)", mn:"'Spassiba' — quem te salva, você agradece.", e:"🙏"},
+      {cyr:"Пожалуйста", tr:"pazhálusta", pt:"Por favor / De nada", mn:"'Pajálusta' — faça a gentileza.", e:"🤲"},
+      {cyr:"Извините", tr:"izviníte", pt:"Desculpe / Com licença", mn:"'Ih, vim' te incomodar.", e:"🙇"},
+      {cyr:"Ничего", tr:"nichivó", pt:"Tudo bem / Não foi nada", mn:"'Nichivo' — 'nada' de mais.", e:"👌"},
+      {cyr:"Хорошо", tr:"kharashó", pt:"Bom / Ok", mn:"'Karashó' — 'caraca, ótimo!'", e:"👍"}
+    ]},
+
+  /* ===== UNIDADE C — FUNDAMENTOS ===== */
+  { id:8, unit:"C", title:"Números 0–10", ru:"Числа 0–10", emoji:"🔢",
+    intro:"Números abrem portas: preços, horas, telefones. Conte nos dedos ao falar (cinestésico).",
+    words:[
+      {cyr:"Ноль", tr:"nol", pt:"0 — zero", mn:"'Nol' — nulo.", e:"0️⃣"},
+      {cyr:"Один", tr:"adín", pt:"1 — um", mn:"'Adin' — a dinâmica começa no 1.", e:"1️⃣"},
+      {cyr:"Два", tr:"dva", pt:"2 — dois", mn:"'Dva' — quase 'dois/two'.", e:"2️⃣"},
+      {cyr:"Три", tr:"tri", pt:"3 — três", mn:"'Tri' — triângulo, 3 lados.", e:"3️⃣"},
+      {cyr:"Четыре", tr:"chitýri", pt:"4 — quatro", mn:"'Chitiri' — chega a 4.", e:"4️⃣"},
+      {cyr:"Пять", tr:"pyat", pt:"5 — cinco", mn:"'Piat' — 5 dedos dão um tapa.", e:"5️⃣"},
+      {cyr:"Шесть", tr:"shest", pt:"6 — seis", mn:"'Shest' — soa como 'chest' (peito).", e:"6️⃣"},
+      {cyr:"Семь", tr:"syem", pt:"7 — sete", mn:"'Syem' — parecido com 'seven'.", e:"7️⃣"},
+      {cyr:"Восемь", tr:"vósim", pt:"8 — oito", mn:"'Vosim' — 'vôo' até o 8.", e:"8️⃣"},
+      {cyr:"Девять", tr:"dyévit", pt:"9 — nove", mn:"'Deviat' — 'deve' faltar 1 pra 10.", e:"9️⃣"},
+      {cyr:"Десять", tr:"dyésit", pt:"10 — dez", mn:"'Desiat' — 'década' tem 10.", e:"🔟"}
+    ]},
+  { id:9, unit:"C", title:"Números 11–100", ru:"Числа 11–100", emoji:"💯",
+    intro:"Agora as dezenas. Repare no padrão '-дцать' que se repete.",
+    note:"11–19 acrescentam '-надцать' à unidade. Dezenas terminam em '-дцать' ou '-десят'.",
+    words:[
+      {cyr:"Одиннадцать", tr:"adínatsat", pt:"11 — onze", mn:"один + надцать = 'um sobre dez'.", e:"1️⃣1️⃣"},
+      {cyr:"Двадцать", tr:"dvátsat", pt:"20 — vinte", mn:"'Dvatsat' — dois-dez.", e:"2️⃣0️⃣"},
+      {cyr:"Тридцать", tr:"trítsat", pt:"30 — trinta", mn:"'Tritsat' — três-dez.", e:"3️⃣0️⃣"},
+      {cyr:"Сорок", tr:"sórak", pt:"40 — quarenta", mn:"'Sorak' — exceção, decore só ele.", e:"4️⃣0️⃣"},
+      {cyr:"Пятьдесят", tr:"pidisyát", pt:"50 — cinquenta", mn:"пять + десят = cinco-dez.", e:"5️⃣0️⃣"},
+      {cyr:"Сто", tr:"sto", pt:"100 — cem", mn:"'Sto' — como 'cento'.", e:"💯"},
+      {cyr:"Тысяча", tr:"týsicha", pt:"1000 — mil", mn:"'Tysicha' — mil, uma tonelada de número.", e:"🔢"}
+    ]},
+  { id:10, unit:"C", title:"Família", ru:"Семья", emoji:"👨‍👩‍👧",
+    intro:"Palavras cheias de emoção. Associe cada uma ao rosto de alguém real seu (ancoragem afetiva).",
+    words:[
+      {cyr:"Семья", tr:"simyá", pt:"família", mn:"'Simya' — a 'semente' da vida.", e:"👨‍👩‍👧"},
+      {cyr:"Мама", tr:"máma", pt:"mãe", mn:"Igual em quase todo idioma.", e:"👩"},
+      {cyr:"Папа", tr:"pápa", pt:"pai", mn:"Igual 'papai'.", e:"👨"},
+      {cyr:"Брат", tr:"brat", pt:"irmão", mn:"'Brat' — como 'brother'.", e:"👦"},
+      {cyr:"Сестра", tr:"sistrá", pt:"irmã", mn:"'Sistra' — como 'sister'.", e:"👧"},
+      {cyr:"Сын", tr:"syn", pt:"filho", mn:"'Syn' — como 'son'.", e:"🧒"},
+      {cyr:"Дочь", tr:"doch", pt:"filha", mn:"'Doch' — como 'daughter'.", e:"👧"},
+      {cyr:"Жена", tr:"zhiná", pt:"esposa", mn:"'Zhiná' — a mulher da casa.", e:"👰"},
+      {cyr:"Муж", tr:"muzh", pt:"marido", mn:"'Muzh' — o 'macho' da casa.", e:"🤵"}
+    ]},
+  { id:11, unit:"C", title:"Cores", ru:"Цвета", emoji:"🎨",
+    intro:"Veja cada cor no objeto ao seu redor enquanto diz a palavra (visual + auditivo).",
+    words:[
+      {cyr:"Цвет", tr:"tsvet", pt:"cor", mn:"'Tsvet' — a raiz de todas as cores.", e:"🎨"},
+      {cyr:"Красный", tr:"krásny", pt:"vermelho", mn:"'Krasny' — 'crás!' sangue vermelho.", e:"🔴"},
+      {cyr:"Синий", tr:"síniy", pt:"azul", mn:"'Siniy' — o 'sino' do céu azul.", e:"🔵"},
+      {cyr:"Зелёный", tr:"zilyóny", pt:"verde", mn:"'Zeliony' — 'zé' na relva verde.", e:"🟢"},
+      {cyr:"Жёлтый", tr:"zhólty", pt:"amarelo", mn:"'Zholty' — o sol 'jôlt' amarelo.", e:"🟡"},
+      {cyr:"Чёрный", tr:"chórny", pt:"preto", mn:"'Chorny' — noite 'chôr' negra.", e:"⚫"},
+      {cyr:"Белый", tr:"bély", pt:"branco", mn:"'Bely' — 'belo' e branco.", e:"⚪"}
+    ]},
+  { id:12, unit:"C", title:"Dias, tempo & horas", ru:"Время", emoji:"⏰",
+    intro:"Organize sua rotina em russo. Ancore 'сегодня' (hoje) ao dia de hoje mesmo.",
+    words:[
+      {cyr:"День", tr:"dyen", pt:"dia", mn:"'Dyen' — o dia inteiro.", e:"📅"},
+      {cyr:"Неделя", tr:"nidyélya", pt:"semana", mn:"'Nedelya' — 7 dias.", e:"🗓️"},
+      {cyr:"Сегодня", tr:"sivódnya", pt:"hoje", mn:"'Sivodnya' — este dia, agora.", e:"📍"},
+      {cyr:"Завтра", tr:"záftra", pt:"amanhã", mn:"'Zaftra' — depois do café da manhã.", e:"➡️"},
+      {cyr:"Вчера", tr:"vcherá", pt:"ontem", mn:"'Vchera' — 'véspera'.", e:"⬅️"},
+      {cyr:"Понедельник", tr:"panidyélnik", pt:"segunda-feira", mn:"O 1º dia depois da 'nedelya'.", e:"1️⃣"},
+      {cyr:"Который час?", tr:"katóry chas", pt:"Que horas são?", mn:"'Chas' = hora.", e:"⏰"}
+    ]},
+
+  /* ===== UNIDADE D — VIDA COTIDIANA ===== */
+  { id:13, unit:"D", title:"Comida & bebida", ru:"Еда и напитки", emoji:"🍽️",
+    intro:"Sobreviver e aproveitar. Imagine o sabor de cada item ao dizer a palavra.",
+    words:[
+      {cyr:"Вода", tr:"vadá", pt:"água", mn:"'Vada' — como 'vodka' sem álcool 😉.", e:"💧"},
+      {cyr:"Хлеб", tr:"khlyeb", pt:"pão", mn:"'Khleb' — a base da mesa russa.", e:"🍞"},
+      {cyr:"Чай", tr:"chay", pt:"chá", mn:"'Chay' — igualzinho 'chá'.", e:"🍵"},
+      {cyr:"Кофе", tr:"kófe", pt:"café", mn:"'Kofe' — quase 'coffee'.", e:"☕"},
+      {cyr:"Мясо", tr:"myása", pt:"carne", mn:"'Myasa' — 'massa' de carne.", e:"🥩"},
+      {cyr:"Рыба", tr:"rýba", pt:"peixe", mn:"'Ryba' — nada no rio.", e:"🐟"},
+      {cyr:"Фрукты", tr:"frúkty", pt:"frutas", mn:"'Frukty' — como 'fruits'.", e:"🍎"},
+      {cyr:"Вкусно", tr:"fkúsna", pt:"gostoso!", mn:"'Fkusna' — que 'gostoso'.", e:"😋"}
+    ]},
+  { id:14, unit:"D", title:"No restaurante", ru:"В ресторане", emoji:"🍴",
+    intro:"Peça com confiança. Ensaie 'Я хочу…' como se já estivesse na mesa.",
+    words:[
+      {cyr:"Меню", tr:"minyú", pt:"cardápio", mn:"'Minyu' — como 'menu'.", e:"📜"},
+      {cyr:"Я хочу…", tr:"ya khachú", pt:"Eu quero…", mn:"'Ya kachu' — eu quero isto.", e:"🙋"},
+      {cyr:"Счёт, пожалуйста", tr:"schot pazhálusta", pt:"A conta, por favor", mn:"'Schot' = conta.", e:"🧾"},
+      {cyr:"Вода без газа", tr:"vadá bez gáza", pt:"Água sem gás", mn:"'Bez gaza' — sem gás.", e:"🚱"},
+      {cyr:"Это вкусно", tr:"éta fkúsna", pt:"Isto está gostoso", mn:"'Eta fkusna' — isto, gostoso.", e:"😋"},
+      {cyr:"Приятного аппетита", tr:"priyátnava apitíta", pt:"Bom apetite", mn:"'Apitita' — apetite.", e:"🍽️"}
+    ]},
+  { id:15, unit:"D", title:"Compras & dinheiro", ru:"Покупки", emoji:"🛒",
+    intro:"Negocie e compre. Diga o preço em voz alta com os números que você já aprendeu.",
+    words:[
+      {cyr:"Сколько это стоит?", tr:"skólka éta stóit", pt:"Quanto custa?", mn:"'Skolka stoit' — quanto está.", e:"💰"},
+      {cyr:"Деньги", tr:"dyéngi", pt:"dinheiro", mn:"'Dengi' — dá pra 'ganhar' dengi.", e:"💵"},
+      {cyr:"Дорого", tr:"dóraga", pt:"caro", mn:"'Doraga' — 'dá raiva' de tão caro.", e:"💸"},
+      {cyr:"Дёшево", tr:"dyóshiva", pt:"barato", mn:"'Deshiva' — 'deixa' barato.", e:"🏷️"},
+      {cyr:"Рубль", tr:"rubl", pt:"rublo (moeda)", mn:"'Rubl' — a moeda russa.", e:"₽"},
+      {cyr:"Я беру это", tr:"ya birú éta", pt:"Eu levo isto", mn:"'Ya biru eta' — eu 'pego' isto.", e:"🛍️"},
+      {cyr:"Магазин", tr:"magazín", pt:"loja", mn:"'Magazin' — como 'magazine/magazém'.", e:"🏬"}
+    ]},
+  { id:16, unit:"D", title:"Cidade & direções", ru:"Город", emoji:"🗺️",
+    intro:"Nunca se perca. Aponte com a mão para cada direção enquanto fala (cinestésico).",
+    words:[
+      {cyr:"Где…?", tr:"gdye", pt:"Onde…?", mn:"'Gdye' — onde está?", e:"❓"},
+      {cyr:"Здесь", tr:"zdyes", pt:"aqui", mn:"'Zdyes' — 'desce' aqui.", e:"📍"},
+      {cyr:"Там", tr:"tam", pt:"lá", mn:"'Tam' — lá, além.", e:"👉"},
+      {cyr:"Налево", tr:"nalyéva", pt:"à esquerda", mn:"'Naleva' — vai pra 'leva'/esquerda.", e:"⬅️"},
+      {cyr:"Направо", tr:"napráva", pt:"à direita", mn:"'Naprava' — 'na prova' vá à direita.", e:"➡️"},
+      {cyr:"Прямо", tr:"pryáma", pt:"em frente / reto", mn:"'Pryama' — 'primo' reto em frente.", e:"⬆️"},
+      {cyr:"Туалет", tr:"tualyét", pt:"banheiro", mn:"'Tualet' — o toalete.", e:"🚻"}
+    ]},
+  { id:17, unit:"D", title:"Transporte & viagem", ru:"Транспорт", emoji:"✈️",
+    intro:"Mova-se pelo país. Útil no aeroporto do Oriente Médio a caminho da Rússia.",
+    words:[
+      {cyr:"Аэропорт", tr:"aeropórt", pt:"aeroporto", mn:"'Aeroport' — quase igual.", e:"🛫"},
+      {cyr:"Такси", tr:"taksí", pt:"táxi", mn:"'Taksi' — táxi.", e:"🚕"},
+      {cyr:"Метро", tr:"mitró", pt:"metrô", mn:"'Metro' — metrô.", e:"🚇"},
+      {cyr:"Билет", tr:"bilyét", pt:"bilhete / passagem", mn:"'Bilet' — como 'bilhete'.", e:"🎫"},
+      {cyr:"Поезд", tr:"póyizt", pt:"trem", mn:"'Poyizd' — a viagem 'poi' vai.", e:"🚆"},
+      {cyr:"Где вокзал?", tr:"gdye vagzál", pt:"Onde é a estação?", mn:"'Vokzal' = estação de trem.", e:"🚉"},
+      {cyr:"Паспорт", tr:"páspart", pt:"passaporte", mn:"'Pasport' — passaporte.", e:"🛂"}
+    ]},
+  { id:18, unit:"D", title:"Clima & tempo", ru:"Погода", emoji:"🌦️",
+    intro:"Todo russo começa conversa falando do tempo. Ótimo quebra-gelo.",
+    words:[
+      {cyr:"Погода", tr:"pagóda", pt:"clima / tempo", mn:"'Pagoda' — o clima do dia.", e:"🌤️"},
+      {cyr:"Жарко", tr:"zhárka", pt:"está quente", mn:"'Zharka' — a 'churrasqueira' quente.", e:"🔥"},
+      {cyr:"Холодно", tr:"khóladna", pt:"está frio", mn:"'Kholadna' — 'cold' russo.", e:"❄️"},
+      {cyr:"Дождь", tr:"dozht", pt:"chuva", mn:"'Dozhd' — pingos caindo.", e:"🌧️"},
+      {cyr:"Солнце", tr:"sóntse", pt:"sol", mn:"'Sontse' — 'sol' que brilha.", e:"☀️"},
+      {cyr:"Снег", tr:"snyek", pt:"neve", mn:"'Sneg' — como 'snow'.", e:"🌨️"},
+      {cyr:"Сегодня жарко", tr:"sivódnya zhárka", pt:"Hoje está quente", mn:"junte hoje + quente.", e:"🥵"}
+    ]},
+
+  /* ===== UNIDADE E — COMUNICAÇÃO ===== */
+  { id:19, unit:"E", title:"Verbos essenciais", ru:"Глаголы", emoji:"🏃",
+    intro:"Verbos dão vida às frases. Com estes 7, você já monta dezenas de frases.",
+    note:"O russo no presente costuma dispensar o verbo 'ser': 'Я тренер' = 'Eu (sou) treinador'.",
+    words:[
+      {cyr:"Быть", tr:"byt", pt:"ser / estar", mn:"'Byt' — 'to be'.", e:"⭐"},
+      {cyr:"Идти", tr:"ittí", pt:"ir (a pé)", mn:"'Itti' — 'ir' andando.", e:"🚶"},
+      {cyr:"Хотеть", tr:"khatyét", pt:"querer", mn:"'Khatet' — 'quero, cato' isto.", e:"🎯"},
+      {cyr:"Говорить", tr:"gavarít", pt:"falar", mn:"'Gavarit' — 'gaba' falando.", e:"💬"},
+      {cyr:"Знать", tr:"znat", pt:"saber", mn:"'Znat' — como 'know'.", e:"🧠"},
+      {cyr:"Есть", tr:"yest", pt:"comer / haver", mn:"'Yest' — comer, ou 'há/existe'.", e:"🍴"},
+      {cyr:"Работать", tr:"rabótat", pt:"trabalhar", mn:"'Rabotat' — do 'robô' que trabalha.", e:"🛠️"}
+    ]},
+  { id:20, unit:"E", title:"Palavras de pergunta", ru:"Вопросы", emoji:"❓",
+    intro:"Perguntar é aprender. Com estas 7 você conduz qualquer conversa.",
+    note:"No russo, a entonação sobe no fim da pergunta — mesmo sem palavra interrogativa.",
+    words:[
+      {cyr:"Кто?", tr:"kto", pt:"Quem?", mn:"'Kto' — 'quem toca?'", e:"🧍"},
+      {cyr:"Что?", tr:"shto", pt:"O quê?", mn:"'Shto' — 'o que é isto?'", e:"📦"},
+      {cyr:"Где?", tr:"gdye", pt:"Onde?", mn:"'Gdye' — onde está.", e:"📍"},
+      {cyr:"Когда?", tr:"kagdá", pt:"Quando?", mn:"'Kagda' — 'que dia'.", e:"📅"},
+      {cyr:"Почему?", tr:"pachimú", pt:"Por quê?", mn:"'Pachimu' — 'pá, chi, mu' curioso.", e:"🤔"},
+      {cyr:"Как?", tr:"kak", pt:"Como?", mn:"'Kak' — de que jeito.", e:"⚙️"},
+      {cyr:"Сколько?", tr:"skólka", pt:"Quanto?", mn:"'Skolka' — a quantidade.", e:"🔢"}
+    ]},
+  { id:21, unit:"E", title:"Saúde & emergência", ru:"Здоровье", emoji:"🚑",
+    intro:"Frases que podem salvar. Guarde-as com atenção redobrada.",
+    note:"Em emergência real na Rússia, o número é 112. Estas frases ajudam a se fazer entender.",
+    words:[
+      {cyr:"Помогите!", tr:"pamagíte", pt:"Ajuda!", mn:"'Pomoguite' — 'poema, agite' pedindo socorro.", e:"🆘"},
+      {cyr:"Врач", tr:"vrach", pt:"médico", mn:"'Vrach' — quem cura.", e:"👨‍⚕️"},
+      {cyr:"Больница", tr:"balnítsa", pt:"hospital", mn:"'Bolnitsa' — onde tratam a dor ('bol').", e:"🏥"},
+      {cyr:"Мне плохо", tr:"mnye plókha", pt:"Estou passando mal", mn:"'Mne plokha' — pra mim, ruim.", e:"🤢"},
+      {cyr:"Здесь болит", tr:"zdyes balít", pt:"Dói aqui", mn:"'Bolit' — 'bole', dói.", e:"🤕"},
+      {cyr:"Аптека", tr:"aptyéka", pt:"farmácia", mn:"'Apteka' — a botica.", e:"💊"},
+      {cyr:"Вызовите скорую", tr:"výzavite skóruyu", pt:"Chame a ambulância", mn:"'Skoruyu' = socorro rápido.", e:"🚑"}
+    ]},
+  { id:22, unit:"E", title:"Trabalho & esporte (seu mundo)", ru:"Работа и спорт", emoji:"🥅",
+    intro:"Feito para você, Lucas. Apresente sua profissão em russo com orgulho.",
+    note:"'Я тренер вратарей' = 'Eu sou treinador de goleiros'. Perfeito para se apresentar por aí.",
+    words:[
+      {cyr:"Работа", tr:"rabóta", pt:"trabalho", mn:"'Rabota' — o que o robô faz.", e:"💼"},
+      {cyr:"Тренер", tr:"tryéner", pt:"treinador", mn:"'Trener' — como 'trainer'.", e:"📋"},
+      {cyr:"Вратарь", tr:"vratár", pt:"goleiro", mn:"'Vratar' — guarda a 'porta' (ворота).", e:"🧤"},
+      {cyr:"Мини-футбол", tr:"míni-futból", pt:"futsal", mn:"'Mini-futbol' — o futsal.", e:"⚽"},
+      {cyr:"Мяч", tr:"myach", pt:"bola", mn:"'Myach' — a bola do jogo.", e:"🏐"},
+      {cyr:"Команда", tr:"kamánda", pt:"time / equipe", mn:"'Komanda' — quem recebe o comando.", e:"👥"},
+      {cyr:"Тренировка", tr:"triniróvka", pt:"treino", mn:"'Trenirovka' — a sessão de treino.", e:"🏋️"},
+      {cyr:"Гол", tr:"gol", pt:"gol", mn:"'Gol' — igualzinho!", e:"🥅"}
+    ]},
+  { id:23, unit:"E", title:"Conversação real", ru:"Разговор", emoji:"🗣️",
+    intro:"As frases que mantêm a conversa viva quando você trava. Seus super-poderes de sobrevivência.",
+    words:[
+      {cyr:"Я не понимаю", tr:"ya ni panimáyu", pt:"Não entendo", mn:"'Ni panimayu' — não 'ponho' na cabeça.", e:"🤷"},
+      {cyr:"Повторите, пожалуйста", tr:"paftaríte pazhálusta", pt:"Repita, por favor", mn:"'Povtorite' — repita.", e:"🔁"},
+      {cyr:"Как по-русски…?", tr:"kak pa-rúski", pt:"Como se diz em russo…?", mn:"'Kak po-russki' — em russo, como?", e:"🇷🇺"},
+      {cyr:"Я немного говорю по-русски", tr:"ya nimnóga gavaryú pa-rúski", pt:"Falo um pouco de russo", mn:"'Nimnoga' = um pouco.", e:"🙂"},
+      {cyr:"Что это значит?", tr:"shto éta znáchit", pt:"O que significa isto?", mn:"'Znachit' — significa.", e:"💡"},
+      {cyr:"Всё хорошо", tr:"vsyo kharashó", pt:"Está tudo bem", mn:"'Vsyo kharasho' — tudo ótimo.", e:"👌"},
+      {cyr:"До встречи", tr:"da fstryéchi", pt:"Até a próxima", mn:"'Vstrechi' = encontro.", e:"👋"}
+    ]}
+];
+
+/* ============================================================
+   DIÁLOGOS — desbloqueiam ao concluir o nível indicado
+   ============================================================ */
+const READING = {"0": [{"cyr": "мама", "tr": "máma", "pt": "mãe", "mn": "Sua 1ª palavra: М-А-М-А, só letras conhecidas!", "e": "🤱"}, {"cyr": "кот", "tr": "kot", "pt": "gato", "mn": "К-О-Т, três sons que você já sabe.", "e": "🐱"}, {"cyr": "атом", "tr": "átom", "pt": "átomo", "mn": "А-Т-О-М, quase igual ao português.", "e": "⚛️"}, {"cyr": "какао", "tr": "kakáo", "pt": "cacau", "mn": "К-А-К-А-О, leia devagar.", "e": "🍫"}, {"cyr": "мате", "tr": "máte", "pt": "mate (erva)", "mn": "М-А-Т-Е, como o chá mate.", "e": "🧉"}], "1": [{"cyr": "рука", "tr": "ruká", "pt": "mão", "mn": "Р-У-К-А, agora com as novas letras.", "e": "✋"}, {"cyr": "нос", "tr": "nos", "pt": "nariz", "mn": "Н-О-С: lembre, Н soa 'n'.", "e": "👃"}, {"cyr": "сок", "tr": "sok", "pt": "suco", "mn": "С-О-К: С soa 's'.", "e": "🧃"}, {"cyr": "метро", "tr": "mitró", "pt": "metrô", "mn": "М-Е-Т-Р-О, uma palavra útil!", "e": "🚇"}, {"cyr": "корова", "tr": "karóva", "pt": "vaca", "mn": "К-О-Р-О-В-А: В soa 'v'.", "e": "🐄"}, {"cyr": "ветер", "tr": "vyéter", "pt": "vento", "mn": "В-Е-Т-Е-Р, todas conhecidas.", "e": "🌬️"}], "2": [{"cyr": "вода", "tr": "vadá", "pt": "água", "mn": "Agora com Д: В-О-Д-А.", "e": "💧"}, {"cyr": "брат", "tr": "brat", "pt": "irmão", "mn": "Б-Р-А-Т: Б parece um 6.", "e": "👦"}, {"cyr": "собака", "tr": "sabáka", "pt": "cachorro", "mn": "С-О-Б-А-К-А, leia em sílabas.", "e": "🐶"}, {"cyr": "город", "tr": "górad", "pt": "cidade", "mn": "Г-О-Р-О-Д: Г soa 'g'.", "e": "🏙️"}, {"cyr": "лампа", "tr": "lámpa", "pt": "lâmpada", "mn": "Л-А-М-П-А: Л é a barraquinha.", "e": "💡"}, {"cyr": "флаг", "tr": "flag", "pt": "bandeira", "mn": "Ф-Л-А-Г: Ф soa 'f'.", "e": "🚩"}], "3": [{"cyr": "чай", "tr": "chay", "pt": "chá", "mn": "Ч-А-Й: Ч soa 'tch', Й é 'i' curto.", "e": "🍵"}, {"cyr": "школа", "tr": "shkóla", "pt": "escola", "mn": "Ш-К-О-Л-А: Ш soa 'ch'.", "e": "🏫"}, {"cyr": "врач", "tr": "vrach", "pt": "médico", "mn": "В-Р-А-Ч, termina em 'tch'.", "e": "👨‍⚕️"}, {"cyr": "машина", "tr": "mashýna", "pt": "carro", "mn": "М-А-Ш-И-Н-А: И soa 'i'.", "e": "🚗"}, {"cyr": "жираф", "tr": "zhiráf", "pt": "girafa", "mn": "Ж-И-Р-А-Ф: Ж soa 'j' francês.", "e": "🦒"}, {"cyr": "цирк", "tr": "tsirk", "pt": "circo", "mn": "Ц-И-Р-К: Ц soa 'ts'.", "e": "🎪"}], "4": [{"cyr": "я", "tr": "ya", "pt": "eu", "mn": "Uma letra que já é uma palavra: Я = eu.", "e": "🙋"}, {"cyr": "сын", "tr": "syn", "pt": "filho", "mn": "С-Ы-Н: Ы é o som gutural.", "e": "👦"}, {"cyr": "день", "tr": "dyen", "pt": "dia", "mn": "Д-Е-Н-Ь: Ь deixa o Н suave.", "e": "📅"}, {"cyr": "семья", "tr": "simyá", "pt": "família", "mn": "С-Е-М-Ь-Я: Ь + Я juntos.", "e": "👨‍👩‍👧"}, {"cyr": "ёж", "tr": "yozh", "pt": "ouriço", "mn": "Ё-Ж: Ё soa 'iô'.", "e": "🦔"}, {"cyr": "эхо", "tr": "ékha", "pt": "eco", "mn": "Э-Х-О: Э é 'é' aberto.", "e": "🔊"}]};
+const EXAMPLES = {"5": [{"cyr": "Привет! Как дела?", "tr": "Privét! Kak diêlá?", "pt": "Oi! Como vai?"}, {"cyr": "Здравствуйте! Доброе утро.", "tr": "Zdrávstvuyte! Dóbroye útra.", "pt": "Olá! Bom dia."}, {"cyr": "До свидания, пока!", "tr": "Da svidániya, paká!", "pt": "Até logo, tchau!"}], "6": [{"cyr": "Меня зовут Лукас.", "tr": "Minyá zavút Lukas.", "pt": "Meu nome é Lucas."}, {"cyr": "Я из Бразилии. Очень приятно!", "tr": "Ya iz Brazílii. Óchin priyátna!", "pt": "Sou do Brasil. Muito prazer!"}, {"cyr": "Как вас зовут?", "tr": "Kak vas zavút?", "pt": "Como você se chama?"}], "7": [{"cyr": "Спасибо большое!", "tr": "Spassíba balshóye!", "pt": "Muito obrigado!"}, {"cyr": "Извините, пожалуйста.", "tr": "Izviníte, pazhálusta.", "pt": "Desculpe, por favor."}, {"cyr": "Да, хорошо. Нет, спасибо.", "tr": "Da, kharashó. Nyet, spassíba.", "pt": "Sim, ok. Não, obrigado."}], "8": [{"cyr": "Один, два, три, четыре, пять.", "tr": "Adín, dva, tri, chitýri, pyat.", "pt": "Um, dois, três, quatro, cinco."}, {"cyr": "У меня два брата.", "tr": "U minyá dva bráta.", "pt": "Tenho dois irmãos."}, {"cyr": "Пять плюс пять — десять.", "tr": "Pyat plyus pyat — dyésit.", "pt": "Cinco mais cinco, dez."}], "9": [{"cyr": "Сто рублей, пожалуйста.", "tr": "Sto rubléy, pazhálusta.", "pt": "Cem rublos, por favor."}, {"cyr": "Двадцать плюс тридцать — пятьдесят.", "tr": "Dvátsat plyus trítsat — pidisyát.", "pt": "Vinte mais trinta, cinquenta."}, {"cyr": "Мне сорок лет.", "tr": "Mnye sórak lyet.", "pt": "Tenho quarenta anos."}], "10": [{"cyr": "Это моя семья.", "tr": "Éta mayá simyá.", "pt": "Esta é minha família."}, {"cyr": "У меня есть брат и сестра.", "tr": "U minyá yest brat i sistrá.", "pt": "Tenho um irmão e uma irmã."}, {"cyr": "Мама и папа дома.", "tr": "Máma i pápa dóma.", "pt": "Mãe e pai estão em casa."}], "11": [{"cyr": "Небо синее, трава зелёная.", "tr": "Nyéba síneye, travá zilyónaya.", "pt": "O céu é azul, a grama é verde."}, {"cyr": "Красный и белый мяч.", "tr": "Krásny i bély myach.", "pt": "Bola vermelha e branca."}, {"cyr": "Какой твой любимый цвет?", "tr": "Kakóy tvoy lyubímy tsvet?", "pt": "Qual sua cor favorita?"}], "12": [{"cyr": "Сегодня понедельник.", "tr": "Sivódnya panidyélnik.", "pt": "Hoje é segunda-feira."}, {"cyr": "Который час? — Три часа.", "tr": "Katóry chas? — Tri chasá.", "pt": "Que horas são? Três horas."}, {"cyr": "Завтра, а не сегодня.", "tr": "Záftra, a ni sivódnya.", "pt": "Amanhã, e não hoje."}], "13": [{"cyr": "Я хочу воду и хлеб.", "tr": "Ya khachú vádu i khlyeb.", "pt": "Quero água e pão."}, {"cyr": "Это очень вкусно!", "tr": "Éta óchin fkúsna!", "pt": "Isto é muito gostoso!"}, {"cyr": "Чай или кофе?", "tr": "Chay íli kófe?", "pt": "Chá ou café?"}], "14": [{"cyr": "Меню, пожалуйста.", "tr": "Minyú, pazhálusta.", "pt": "O cardápio, por favor."}, {"cyr": "Я хочу рыбу.", "tr": "Ya khachú rýbu.", "pt": "Quero peixe."}, {"cyr": "Счёт, пожалуйста.", "tr": "Schot, pazhálusta.", "pt": "A conta, por favor."}], "15": [{"cyr": "Сколько это стоит?", "tr": "Skólka éta stóit?", "pt": "Quanto custa isto?"}, {"cyr": "Это дорого!", "tr": "Éta dóraga!", "pt": "Isto é caro!"}, {"cyr": "Хорошо, я беру это.", "tr": "Kharashó, ya birú éta.", "pt": "Ok, eu levo isto."}], "16": [{"cyr": "Извините, где метро?", "tr": "Izviníte, gdye mitró?", "pt": "Com licença, onde é o metrô?"}, {"cyr": "Идите прямо, потом налево.", "tr": "Idíte pryáma, patóm nalyéva.", "pt": "Vá reto, depois à esquerda."}, {"cyr": "Туалет направо.", "tr": "Tualyét napráva.", "pt": "O banheiro é à direita."}], "17": [{"cyr": "В аэропорт, пожалуйста.", "tr": "V aeropórt, pazhálusta.", "pt": "Ao aeroporto, por favor."}, {"cyr": "Где вокзал?", "tr": "Gdye vagzál?", "pt": "Onde fica a estação?"}, {"cyr": "Вот мой паспорт и билет.", "tr": "Vot moy páspart i bilyét.", "pt": "Aqui meu passaporte e passagem."}], "18": [{"cyr": "Сегодня жарко.", "tr": "Sivódnya zhárka.", "pt": "Hoje está quente."}, {"cyr": "Завтра будет дождь.", "tr": "Záftra búdit dozht.", "pt": "Amanhã vai chover."}, {"cyr": "Зимой холодно и снег.", "tr": "Zimóy khóladna i snyek.", "pt": "No inverno faz frio e neva."}], "19": [{"cyr": "Я хочу есть.", "tr": "Ya khachú yest.", "pt": "Quero comer."}, {"cyr": "Я работаю тренером.", "tr": "Ya rabótayu tryéneram.", "pt": "Trabalho como treinador."}, {"cyr": "Ты говоришь по-русски?", "tr": "Ty gavarísh pa-rúski?", "pt": "Você fala russo?"}], "20": [{"cyr": "Кто это? Что это?", "tr": "Kto éta? Shto éta?", "pt": "Quem é? O que é isto?"}, {"cyr": "Где и когда?", "tr": "Gdye i kagdá?", "pt": "Onde e quando?"}, {"cyr": "Почему? Как?", "tr": "Pachimú? Kak?", "pt": "Por quê? Como?"}], "21": [{"cyr": "Мне плохо, помогите!", "tr": "Mnye plókha, pamagíte!", "pt": "Estou mal, ajuda!"}, {"cyr": "Где больница?", "tr": "Gdye balnítsa?", "pt": "Onde é o hospital?"}, {"cyr": "Вызовите скорую!", "tr": "Výzavite skóruyu!", "pt": "Chame a ambulância!"}], "22": [{"cyr": "Я тренер вратарей.", "tr": "Ya tryéner vrataréy.", "pt": "Sou treinador de goleiros."}, {"cyr": "Моя команда играет в футзал.", "tr": "Mayá kamánda igráit v futzál.", "pt": "Meu time joga futsal."}, {"cyr": "Гол! Мы выиграли!", "tr": "Gol! My výigrali!", "pt": "Gol! Ganhamos!"}], "23": [{"cyr": "Я не понимаю, повторите, пожалуйста.", "tr": "Ya ni panimáyu, paftaríte, pazhálusta.", "pt": "Não entendo, repita, por favor."}, {"cyr": "Как это по-русски?", "tr": "Kak éta pa-rúski?", "pt": "Como se diz isto em russo?"}, {"cyr": "Всё хорошо, до встречи!", "tr": "Vsyo kharashó, da fstryéchi!", "pt": "Tudo bem, até a próxima!"}]};
+LEVELS.forEach(l=>{ if(READING[l.id]) l.words=l.words.concat(READING[l.id]); if(EXAMPLES[l.id]) l.examples=EXAMPLES[l.id]; });
+
+const MOREWORDS = {"5": [{"cyr": "Как дела?", "tr": "kak diêlá", "pt": "Como vai?", "mn": "Pergunta-chave do dia a dia.", "e": "💬"}, {"cyr": "Спокойной ночи", "tr": "spakóynay nóchi", "pt": "Boa noite (ao dormir)", "mn": "'Spakoynay' — noite tranquila.", "e": "🌙"}, {"cyr": "Добро пожаловать", "tr": "dabró pazhálavat", "pt": "Bem-vindo", "mn": "'Dobro' = bom.", "e": "🎉"}, {"cyr": "До встречи", "tr": "da fstryéchi", "pt": "Até a próxima", "mn": "'Vstrechi' = encontro.", "e": "👋"}, {"cyr": "Увидимся", "tr": "uvídimsya", "pt": "A gente se vê", "mn": "Informal e simpático.", "e": "🙂"}, {"cyr": "Как ты?", "tr": "kak ty", "pt": "Como você está? (informal)", "mn": "Versão informal de 'kak dela'.", "e": "😊"}, {"cyr": "Рад тебя видеть", "tr": "rat tibyá vídit", "pt": "Feliz em te ver", "mn": "Para reencontros.", "e": "🤗"}], "6": [{"cyr": "Сколько вам лет?", "tr": "skólka vam lyet", "pt": "Quantos anos você tem?", "mn": "'Skolka let' = quantos anos.", "e": "🎂"}, {"cyr": "Мне … лет", "tr": "mnye … lyet", "pt": "Tenho … anos", "mn": "Preencha com o número.", "e": "🔢"}, {"cyr": "Где вы живёте?", "tr": "gdye vy zhivyóte", "pt": "Onde você mora?", "mn": "'Zhivyote' = mora.", "e": "🏠"}, {"cyr": "Я живу здесь", "tr": "ya zhivú zdyes", "pt": "Eu moro aqui", "mn": "'Zhivu' = (eu) moro.", "e": "📍"}, {"cyr": "Приятно познакомиться", "tr": "priyátna paznakómitsa", "pt": "Prazer em conhecer", "mn": "Formal e educado.", "e": "🤝"}, {"cyr": "Я не говорю по-русски", "tr": "ya ni gavaryú pa-rúski", "pt": "Não falo russo", "mn": "Frase de emergência útil.", "e": "🙊"}, {"cyr": "Я учу русский", "tr": "ya uchú rúski", "pt": "Estou aprendendo russo", "mn": "'Uchu' = (eu) aprendo.", "e": "📚"}], "7": [{"cyr": "Не за что", "tr": "nye za shto", "pt": "Por nada / imagina", "mn": "Resposta a um obrigado.", "e": "🤲"}, {"cyr": "Можно?", "tr": "mózhna", "pt": "Posso? / É permitido?", "mn": "Peça permissão com isto.", "e": "🙋"}, {"cyr": "Конечно", "tr": "kanyéshna", "pt": "Claro / com certeza", "mn": "'Kanyeshna' — óbvio.", "e": "👍"}, {"cyr": "Простите", "tr": "prastíte", "pt": "Perdão / desculpe", "mn": "Mais forte que 'izvinite'.", "e": "🙏"}, {"cyr": "С удовольствием", "tr": "s udavólstviyem", "pt": "Com prazer", "mn": "Aceite convites assim.", "e": "😄"}, {"cyr": "Всё в порядке", "tr": "vsyo v paryátke", "pt": "Está tudo em ordem", "mn": "'V poryadke' = em ordem.", "e": "✅"}, {"cyr": "Хорошего дня", "tr": "kharóshiva dnya", "pt": "Tenha um bom dia", "mn": "Despedida gentil.", "e": "🌤️"}], "8": [{"cyr": "Сколько?", "tr": "skólka", "pt": "Quanto? / Quantos?", "mn": "Pergunta de quantidade.", "e": "❓"}, {"cyr": "Много", "tr": "mnóga", "pt": "muito", "mn": "'Mnoga' = muito.", "e": "📈"}, {"cyr": "Мало", "tr": "mála", "pt": "pouco", "mn": "'Mala' = pouco.", "e": "📉"}, {"cyr": "Первый", "tr": "pyérvy", "pt": "primeiro", "mn": "Ordinal básico.", "e": "🥇"}, {"cyr": "Второй", "tr": "ftaróy", "pt": "segundo", "mn": "Ordinal básico.", "e": "🥈"}, {"cyr": "Номер", "tr": "nómer", "pt": "número", "mn": "'Nomer' = número.", "e": "#️⃣"}, {"cyr": "Половина", "tr": "palavína", "pt": "metade", "mn": "'Palavina' = metade.", "e": "➗"}], "9": [{"cyr": "Двенадцать", "tr": "dvinátsat", "pt": "12 — doze", "mn": "один+... padrão -надцать.", "e": "🔢"}, {"cyr": "Пятнадцать", "tr": "pitnátsat", "pt": "15 — quinze", "mn": "'Pitnatsat'.", "e": "🔢"}, {"cyr": "Шестьдесят", "tr": "shizdisyát", "pt": "60 — sessenta", "mn": "'-desyat' das dezenas.", "e": "🔢"}, {"cyr": "Семьдесят", "tr": "syémdisyat", "pt": "70 — setenta", "mn": "'Syemdesyat'.", "e": "🔢"}, {"cyr": "Восемьдесят", "tr": "vósimdisyat", "pt": "80 — oitenta", "mn": "'Vosimdesyat'.", "e": "🔢"}, {"cyr": "Девяносто", "tr": "divinósta", "pt": "90 — noventa", "mn": "Exceção: decore.", "e": "🔢"}, {"cyr": "Двести", "tr": "dvésti", "pt": "200 — duzentos", "mn": "два+сто → двести.", "e": "💯"}, {"cyr": "Первый раз", "tr": "pyérvy raz", "pt": "primeira vez", "mn": "'Raz' = vez.", "e": "🔂"}], "10": [{"cyr": "Бабушка", "tr": "bábushka", "pt": "avó", "mn": "'Babushka' — a vovó russa.", "e": "👵"}, {"cyr": "Дедушка", "tr": "dyédushka", "pt": "avô", "mn": "'Dedushka' — o vovô.", "e": "👴"}, {"cyr": "Дети", "tr": "dyéti", "pt": "filhos / crianças", "mn": "Plural de criança.", "e": "🧒"}, {"cyr": "Ребёнок", "tr": "ribyónak", "pt": "criança / bebê", "mn": "'Rebyonok'.", "e": "👶"}, {"cyr": "Друг", "tr": "druk", "pt": "amigo", "mn": "'Druk' — amigo próximo.", "e": "🧑‍🤝‍🧑"}, {"cyr": "Подруга", "tr": "padrúga", "pt": "amiga", "mn": "Feminino de amigo.", "e": "👭"}, {"cyr": "Родители", "tr": "radíteli", "pt": "pais (mãe e pai)", "mn": "'Roditeli'.", "e": "👨‍👩‍👦"}, {"cyr": "Люблю тебя", "tr": "lyublyú tibyá", "pt": "Amo você", "mn": "Frase afetiva.", "e": "❤️"}], "11": [{"cyr": "Оранжевый", "tr": "aránzhivy", "pt": "laranja (cor)", "mn": "Como 'orange'.", "e": "🟠"}, {"cyr": "Розовый", "tr": "rózavy", "pt": "rosa", "mn": "'Rozavy' — de rosa.", "e": "🌸"}, {"cyr": "Серый", "tr": "syéry", "pt": "cinza", "mn": "'Syery'.", "e": "🩶"}, {"cyr": "Коричневый", "tr": "karíchnivy", "pt": "marrom", "mn": "'Korichnevy'.", "e": "🟤"}, {"cyr": "Голубой", "tr": "galubóy", "pt": "azul-claro", "mn": "Distinto de синий (azul escuro).", "e": "🩵"}, {"cyr": "Светлый", "tr": "svyétly", "pt": "claro", "mn": "'Svetly' = claro.", "e": "🔆"}, {"cyr": "Тёмный", "tr": "tyómny", "pt": "escuro", "mn": "'Tyomny' = escuro.", "e": "🌑"}], "12": [{"cyr": "Час", "tr": "chas", "pt": "hora", "mn": "'Chas' = hora.", "e": "🕐"}, {"cyr": "Минута", "tr": "minúta", "pt": "minuto", "mn": "'Minuta'.", "e": "⏱️"}, {"cyr": "Утро", "tr": "útra", "pt": "manhã", "mn": "'Utra' = manhã.", "e": "🌅"}, {"cyr": "Вечер", "tr": "vécher", "pt": "tarde/noite", "mn": "'Vecher'.", "e": "🌆"}, {"cyr": "Ночь", "tr": "noch", "pt": "noite", "mn": "'Noch'.", "e": "🌃"}, {"cyr": "Месяц", "tr": "myésyats", "pt": "mês", "mn": "'Mesyats'.", "e": "🗓️"}, {"cyr": "Год", "tr": "got", "pt": "ano", "mn": "'God' = ano.", "e": "📆"}, {"cyr": "Сейчас", "tr": "siychás", "pt": "agora", "mn": "'Siychas' = agora.", "e": "⏳"}], "13": [{"cyr": "Молоко", "tr": "malakó", "pt": "leite", "mn": "'Malako'.", "e": "🥛"}, {"cyr": "Сыр", "tr": "syr", "pt": "queijo", "mn": "'Syr'.", "e": "🧀"}, {"cyr": "Яйцо", "tr": "yaytsó", "pt": "ovo", "mn": "'Yaytso'.", "e": "🥚"}, {"cyr": "Суп", "tr": "sup", "pt": "sopa", "mn": "'Sup' = sopa.", "e": "🍲"}, {"cyr": "Соль", "tr": "sol", "pt": "sal", "mn": "'Sol' = sal.", "e": "🧂"}, {"cyr": "Сахар", "tr": "sákhar", "pt": "açúcar", "mn": "'Sakhar'.", "e": "🍬"}, {"cyr": "Яблоко", "tr": "yáblaka", "pt": "maçã", "mn": "'Yablaka'.", "e": "🍎"}, {"cyr": "Курица", "tr": "kúritsa", "pt": "frango", "mn": "'Kuritsa'.", "e": "🍗"}, {"cyr": "Овощи", "tr": "óvaschi", "pt": "legumes", "mn": "'Ovoschi'.", "e": "🥕"}], "14": [{"cyr": "Официант", "tr": "afitsiánt", "pt": "garçom", "mn": "'Ofitsiant'.", "e": "🧑‍🍳"}, {"cyr": "Завтрак", "tr": "záftrak", "pt": "café da manhã", "mn": "'Zaftrak'.", "e": "🍳"}, {"cyr": "Обед", "tr": "abyét", "pt": "almoço", "mn": "'Obed'.", "e": "🍽️"}, {"cyr": "Ужин", "tr": "úzhin", "pt": "jantar", "mn": "'Uzhin'.", "e": "🌙"}, {"cyr": "Вилка", "tr": "vílka", "pt": "garfo", "mn": "'Vilka'.", "e": "🍴"}, {"cyr": "Ложка", "tr": "lóshka", "pt": "colher", "mn": "'Loshka'.", "e": "🥄"}, {"cyr": "Нож", "tr": "nozh", "pt": "faca", "mn": "'Nozh'.", "e": "🔪"}, {"cyr": "Тарелка", "tr": "tarélka", "pt": "prato", "mn": "'Tarelka'.", "e": "🍽️"}], "15": [{"cyr": "Касса", "tr": "kássa", "pt": "caixa (para pagar)", "mn": "'Kassa'.", "e": "🧾"}, {"cyr": "Карта", "tr": "kárta", "pt": "cartão", "mn": "'Karta' — cartão/mapa.", "e": "💳"}, {"cyr": "Скидка", "tr": "skítka", "pt": "desconto", "mn": "'Skidka'.", "e": "🏷️"}, {"cyr": "Размер", "tr": "razmyér", "pt": "tamanho", "mn": "'Razmer'.", "e": "📏"}, {"cyr": "Открыто", "tr": "atkrýta", "pt": "aberto", "mn": "'Otkryta'.", "e": "🟢"}, {"cyr": "Закрыто", "tr": "zakrýta", "pt": "fechado", "mn": "'Zakryta'.", "e": "🔴"}, {"cyr": "Чек", "tr": "chek", "pt": "recibo", "mn": "'Chek'.", "e": "🧾"}, {"cyr": "Наличные", "tr": "nalíchnye", "pt": "dinheiro (espécie)", "mn": "'Nalichnye'.", "e": "💵"}], "16": [{"cyr": "Улица", "tr": "úlitsa", "pt": "rua", "mn": "'Ulitsa'.", "e": "🛣️"}, {"cyr": "Площадь", "tr": "plóschat", "pt": "praça", "mn": "'Ploschad'.", "e": "🏛️"}, {"cyr": "Далеко", "tr": "dalikó", "pt": "longe", "mn": "'Daliko'.", "e": "↔️"}, {"cyr": "Близко", "tr": "blízka", "pt": "perto", "mn": "'Blizka'.", "e": "📍"}, {"cyr": "Угол", "tr": "úgal", "pt": "esquina/canto", "mn": "'Ugal'.", "e": "📐"}, {"cyr": "Остановка", "tr": "astanófka", "pt": "ponto (de ônibus)", "mn": "'Astanovka'.", "e": "🚏"}, {"cyr": "Карта", "tr": "kárta", "pt": "mapa", "mn": "'Karta' — mapa/cartão.", "e": "🗺️"}, {"cyr": "Здесь рядом", "tr": "zdyes ryádam", "pt": "aqui perto", "mn": "'Ryadam' = ao lado.", "e": "🔎"}], "17": [{"cyr": "Автобус", "tr": "aftóbus", "pt": "ônibus", "mn": "'Aftobus'.", "e": "🚌"}, {"cyr": "Машина", "tr": "mashýna", "pt": "carro", "mn": "'Mashyna'.", "e": "🚗"}, {"cyr": "Самолёт", "tr": "samalyót", "pt": "avião", "mn": "'Samalyot'.", "e": "✈️"}, {"cyr": "Багаж", "tr": "bagázh", "pt": "bagagem", "mn": "'Bagazh'.", "e": "🧳"}, {"cyr": "Чемодан", "tr": "chimadán", "pt": "mala", "mn": "'Chemodan'.", "e": "🧳"}, {"cyr": "Направление", "tr": "napravlyéniye", "pt": "direção/sentido", "mn": "'Napravlenie'.", "e": "🧭"}, {"cyr": "Опоздать", "tr": "apazdát", "pt": "atrasar-se", "mn": "'Apazdat'.", "e": "⏰"}, {"cyr": "Быстрее", "tr": "bystréye", "pt": "mais rápido", "mn": "'Bystreye'.", "e": "💨"}], "18": [{"cyr": "Тепло", "tr": "tipló", "pt": "quente/morno", "mn": "'Tiplo'.", "e": "🌡️"}, {"cyr": "Прохладно", "tr": "prakhládna", "pt": "fresco", "mn": "'Prakhladna'.", "e": "🍃"}, {"cyr": "Облако", "tr": "óblaka", "pt": "nuvem", "mn": "'Oblaka'.", "e": "☁️"}, {"cyr": "Туман", "tr": "tumán", "pt": "neblina", "mn": "'Tuman'.", "e": "🌫️"}, {"cyr": "Зима", "tr": "zimá", "pt": "inverno", "mn": "'Zima'.", "e": "❄️"}, {"cyr": "Лето", "tr": "lyéta", "pt": "verão", "mn": "'Leta'.", "e": "☀️"}, {"cyr": "Весна", "tr": "visná", "pt": "primavera", "mn": "'Vesna'.", "e": "🌷"}, {"cyr": "Осень", "tr": "ósin", "pt": "outono", "mn": "'Osen'.", "e": "🍂"}], "19": [{"cyr": "Делать", "tr": "dyélat", "pt": "fazer", "mn": "'Delat'.", "e": "🛠️"}, {"cyr": "Видеть", "tr": "vídit", "pt": "ver", "mn": "'Videt'.", "e": "👀"}, {"cyr": "Читать", "tr": "chitát", "pt": "ler", "mn": "'Chitat'.", "e": "📖"}, {"cyr": "Писать", "tr": "pisát", "pt": "escrever", "mn": "'Pisat'.", "e": "✍️"}, {"cyr": "Жить", "tr": "zhit", "pt": "viver / morar", "mn": "'Zhit'.", "e": "🏡"}, {"cyr": "Любить", "tr": "lyubít", "pt": "amar / gostar", "mn": "'Lyubit'.", "e": "❤️"}, {"cyr": "Мочь", "tr": "moch", "pt": "poder", "mn": "'Moch'.", "e": "💪"}, {"cyr": "Понимать", "tr": "panimát", "pt": "entender", "mn": "'Panimat'.", "e": "🧠"}, {"cyr": "Учить", "tr": "uchít", "pt": "aprender / estudar", "mn": "'Uchit'.", "e": "📚"}], "20": [{"cyr": "Какой", "tr": "kakóy", "pt": "qual / que tipo", "mn": "'Kakoy'.", "e": "🔍"}, {"cyr": "Куда", "tr": "kudá", "pt": "para onde", "mn": "'Kuda'.", "e": "➡️"}, {"cyr": "Откуда", "tr": "atkúda", "pt": "de onde", "mn": "'Atkuda'.", "e": "⬅️"}, {"cyr": "Зачем", "tr": "zachyém", "pt": "para quê", "mn": "'Zachem'.", "e": "🎯"}, {"cyr": "Чей", "tr": "chey", "pt": "de quem", "mn": "'Chey'.", "e": "🙋"}, {"cyr": "Правда?", "tr": "právda", "pt": "verdade? / né?", "mn": "'Pravda'.", "e": "❔"}, {"cyr": "Что случилось?", "tr": "shto sluchílas", "pt": "O que aconteceu?", "mn": "Muito útil.", "e": "⚠️"}, {"cyr": "Можно спросить?", "tr": "mózhna sprasít", "pt": "Posso perguntar?", "mn": "Abre uma pergunta.", "e": "🗣️"}], "21": [{"cyr": "Голова", "tr": "galavá", "pt": "cabeça", "mn": "'Galava'.", "e": "🤕"}, {"cyr": "Живот", "tr": "zhivót", "pt": "barriga", "mn": "'Zhivot'.", "e": "🫃"}, {"cyr": "Горло", "tr": "górla", "pt": "garganta", "mn": "'Gorla'.", "e": "😷"}, {"cyr": "Зуб", "tr": "zub", "pt": "dente", "mn": "'Zub'.", "e": "🦷"}, {"cyr": "Температура", "tr": "timpiratúra", "pt": "febre / temperatura", "mn": "'Temperatura'.", "e": "🌡️"}, {"cyr": "Лекарство", "tr": "likárstva", "pt": "remédio", "mn": "'Lekarstva'.", "e": "💊"}, {"cyr": "Устал", "tr": "ustál", "pt": "cansado", "mn": "'Ustal'.", "e": "😩"}, {"cyr": "Мне нужен врач", "tr": "mnye núzhen vrach", "pt": "Preciso de um médico", "mn": "Frase de emergência.", "e": "🚑"}], "22": [{"cyr": "Игрок", "tr": "igrók", "pt": "jogador", "mn": "'Igrok'.", "e": "🏃"}, {"cyr": "Матч", "tr": "match", "pt": "partida / jogo", "mn": "'Match'.", "e": "🆚"}, {"cyr": "Победа", "tr": "pabyéda", "pt": "vitória", "mn": "'Pabeda'.", "e": "🏆"}, {"cyr": "Ворота", "tr": "varóta", "pt": "gol (baliza/trave)", "mn": "O goleiro guarda a варота.", "e": "🥅"}, {"cyr": "Защита", "tr": "zaschíta", "pt": "defesa", "mn": "'Zaschita'.", "e": "🛡️"}, {"cyr": "Пас", "tr": "pas", "pt": "passe", "mn": "'Pas'.", "e": "🔁"}, {"cyr": "Судья", "tr": "sudyá", "pt": "árbitro", "mn": "'Sudya'.", "e": "🧑‍⚖️"}, {"cyr": "Спортзал", "tr": "sportzál", "pt": "ginásio", "mn": "'Sportzal'.", "e": "🏟️"}, {"cyr": "Тренировка сегодня", "tr": "triniróvka sivódnya", "pt": "treino hoje", "mn": "Junte treino + hoje.", "e": "📅"}], "23": [{"cyr": "Может быть", "tr": "mózhet byt", "pt": "talvez", "mn": "'Mozhet byt'.", "e": "🤔"}, {"cyr": "Я согласен", "tr": "ya saglásin", "pt": "concordo", "mn": "'Saglasen'.", "e": "🤝"}, {"cyr": "Наверное", "tr": "navyérnaye", "pt": "provavelmente", "mn": "'Navernaye'.", "e": "🎲"}, {"cyr": "Точно", "tr": "tóchna", "pt": "exato / com certeza", "mn": "'Tochna'.", "e": "🎯"}, {"cyr": "Ещё раз", "tr": "yeschó raz", "pt": "mais uma vez", "mn": "'Yeschо raz'.", "e": "🔁"}, {"cyr": "Медленнее", "tr": "myédlinnie", "pt": "mais devagar", "mn": "Peça para falarem devagar.", "e": "🐢"}, {"cyr": "Я не уверен", "tr": "ya ni uvyérin", "pt": "não tenho certeza", "mn": "'Ne uveren'.", "e": "🤷"}, {"cyr": "Что это значит?", "tr": "shto éta znáchit", "pt": "O que significa isto?", "mn": "Sua pergunta salva-vidas.", "e": "💡"}]};
+LEVELS.forEach(l=>{ if(MOREWORDS[l.id]) l.words=l.words.concat(MOREWORDS[l.id]); });
+
+const DIALOGS = [
+  { afterLevel:5, title:"Primeiro encontro",
+    turns:[
+      {who:"them", cyr:"Привет!", tr:"Privét!", pt:"Oi!"},
+      {who:"me", opts:[{cyr:"Привет!", tr:"Privét!", pt:"Oi!", ok:true},{cyr:"Спасибо", tr:"Spassíba", pt:"Obrigado", ok:false}]},
+      {who:"them", cyr:"Как дела?", tr:"Kak diêlá?", pt:"Como vai?"},
+      {who:"me", opts:[{cyr:"Хорошо, а ты?", tr:"Kharashó, a ty?", pt:"Bem, e você?", ok:true},{cyr:"Пока", tr:"Paká", pt:"Tchau", ok:false}]},
+      {who:"them", cyr:"Тоже хорошо. Как тебя зовут?", tr:"Tózhe kharashó. Kak tibyá zavút?", pt:"Também bem. Como você se chama?"},
+      {who:"me", opts:[{cyr:"Меня зовут Лукас", tr:"Minyá zavút Lukas", pt:"Meu nome é Lucas", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]},
+      {who:"them", cyr:"Очень приятно, Лукас! А я Антон.", tr:"Óchin priyátna, Lukas! A ya Antón.", pt:"Muito prazer, Lucas! Eu sou Anton."},
+      {who:"me", opts:[{cyr:"Очень приятно, Антон!", tr:"Óchin priyátna, Antón!", pt:"Muito prazer, Anton!", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Откуда ты?", tr:"Atkúda ty?", pt:"De onde você é?"},
+      {who:"me", opts:[{cyr:"Я из Бразилии", tr:"Ya iz Brazílii", pt:"Sou do Brasil", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Здорово! Что ты делаешь здесь?", tr:"Zdórava! Shto ty dyélaish zdyes?", pt:"Legal! O que você faz aqui?"},
+      {who:"me", opts:[{cyr:"Я тренер", tr:"Ya tryéner", pt:"Sou treinador", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Тренер? Круто! Какой спорт?", tr:"Tryéner? Krúta! Kakóy sport?", pt:"Treinador? Maneiro! Qual esporte?"},
+      {who:"me", opts:[{cyr:"Мини-футбол", tr:"Míni-futból", pt:"Futsal", ok:true},{cyr:"Вода", tr:"Vadá", pt:"Água", ok:false}]},
+      {who:"them", cyr:"Интересно! Ты хорошо говоришь по-русски.", tr:"Intiésna! Ty kharashó gavarísh pa-rúski.", pt:"Interessante! Você fala bem russo."},
+      {who:"me", opts:[{cyr:"Спасибо! Немного", tr:"Spassíba! Nimnóga", pt:"Obrigado! Um pouco", ok:true},{cyr:"Холодно", tr:"Khóladna", pt:"Frio", ok:false}]},
+      {who:"them", cyr:"Хочешь кофе?", tr:"Khóchish kófe?", pt:"Quer um café?"},
+      {who:"me", opts:[{cyr:"Да, спасибо!", tr:"Da, spassíba!", pt:"Sim, obrigado!", ok:true},{cyr:"Красный", tr:"Krásny", pt:"Vermelho", ok:false}]},
+      {who:"them", cyr:"Отлично, пойдём!", tr:"Atlíchna, paydyóm!", pt:"Ótimo, vamos!"},
+      {who:"me", opts:[{cyr:"Пойдём!", tr:"Paydyóm!", pt:"Vamos!", ok:true},{cyr:"Плохо", tr:"Plókha", pt:"Mal", ok:false}]},
+      {who:"them", cyr:"Было приятно поговорить!", tr:"Býla priyátna pagavarít!", pt:"Foi bom conversar!"},
+      {who:"me", opts:[{cyr:"Мне тоже! До встречи!", tr:"Mnye tózhe! Da fstryéchi!", pt:"Pra mim também! Até logo!", ok:true},{cyr:"Помогите", tr:"Pamagíte", pt:"Socorro", ok:false}]}
+    ]},
+  { afterLevel:5, title:"Bom dia, vizinho",
+    turns:[
+      {who:"them", cyr:"Доброе утро!", tr:"Dóbroye útra!", pt:"Bom dia!"},
+      {who:"me", opts:[{cyr:"Доброе утро!", tr:"Dóbroye útra!", pt:"Bom dia!", ok:true},{cyr:"Пока", tr:"Paká", pt:"Tchau", ok:false}]},
+      {who:"them", cyr:"Как ваши дела сегодня?", tr:"Kak váshi diêlá sivódnya?", pt:"Como o senhor vai hoje?"},
+      {who:"me", opts:[{cyr:"Хорошо, а у вас?", tr:"Kharashó, a u vas?", pt:"Bem, e o senhor?", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]},
+      {who:"them", cyr:"Тоже неплохо, спасибо.", tr:"Tózhe niplókha, spassíba.", pt:"Também bem, obrigado."},
+      {who:"me", opts:[{cyr:"Очень хорошо!", tr:"Óchin kharashó!", pt:"Que bom!", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Кстати, меня зовут Ольга.", tr:"Kstáti, minyá zavút Ólga.", pt:"Aliás, meu nome é Olga."},
+      {who:"me", opts:[{cyr:"Очень приятно, Ольга!", tr:"Óchin priyátna, Ólga!", pt:"Muito prazer, Olga!", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Вы куда-то спешите?", tr:"Vy kudá-ta spishíte?", pt:"O senhor está com pressa?"},
+      {who:"me", opts:[{cyr:"Да, я иду на работу", tr:"Da, ya idú na rabótu", pt:"Sim, estou indo trabalhar", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"А кем вы работаете?", tr:"A kem vy rabótaite?", pt:"E o senhor trabalha com o quê?"},
+      {who:"me", opts:[{cyr:"Я тренер вратарей", tr:"Ya tryéner vrataréy", pt:"Sou treinador de goleiros", ok:true},{cyr:"Дождь", tr:"Dozht", pt:"Chuva", ok:false}]},
+      {who:"them", cyr:"Как интересно! Удачи вам!", tr:"Kak intiésna! Udáchi vam!", pt:"Que interessante! Boa sorte!"},
+      {who:"me", opts:[{cyr:"Спасибо большое!", tr:"Spassíba balshóye!", pt:"Muito obrigado!", ok:true},{cyr:"Холодно", tr:"Khóladna", pt:"Frio", ok:false}]},
+      {who:"them", cyr:"Хорошего дня!", tr:"Kharóshiva dnya!", pt:"Tenha um bom dia!"},
+      {who:"me", opts:[{cyr:"Вам тоже!", tr:"Vam tózhe!", pt:"Para o senhor também!", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"У вас есть минутка?", tr:"U vas yest minútka?", pt:"Você tem um minutinho?"},
+      {who:"me", opts:[{cyr:"Да, конечно", tr:"Da, kanyéshna", pt:"Sim, claro", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Вы давно здесь живёте?", tr:"Vy davnó zdyes zhivyóte?", pt:"Você mora aqui há muito tempo?"},
+      {who:"me", opts:[{cyr:"Нет, недавно", tr:"Nyet, nidávna", pt:"Não, há pouco", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"До свидания!", tr:"Da svidániya!", pt:"Até logo!"},
+      {who:"me", opts:[{cyr:"До свидания, Ольга!", tr:"Da svidániya, Ólga!", pt:"Até logo, Olga!", ok:true},{cyr:"Помогите", tr:"Pamagíte", pt:"Socorro", ok:false}]}
+    ]},
+  { afterLevel:6, title:"Me apresentando",
+    turns:[
+      {who:"them", cyr:"Здравствуйте! Как вас зовут?", tr:"Zdrávstvuyte! Kak vas zavút?", pt:"Olá! Como se chama?"},
+      {who:"me", opts:[{cyr:"Меня зовут Лукас", tr:"Minyá zavút Lukas", pt:"Meu nome é Lucas", ok:true},{cyr:"Плохо", tr:"Plókha", pt:"Mal", ok:false}]},
+      {who:"them", cyr:"Очень приятно! А я Ирина.", tr:"Óchin priyátna! A ya Irína.", pt:"Muito prazer! Eu sou Irina."},
+      {who:"me", opts:[{cyr:"Очень приятно, Ирина!", tr:"Óchin priyátna, Irína!", pt:"Muito prazer, Irina!", ok:true},{cyr:"Да", tr:"Da", pt:"Sim", ok:false}]},
+      {who:"them", cyr:"Откуда вы?", tr:"Atkúda vy?", pt:"De onde você é?"},
+      {who:"me", opts:[{cyr:"Я из Бразилии", tr:"Ya iz Brazílii", pt:"Sou do Brasil", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"О, Бразилия! А где вы живёте сейчас?", tr:"O, Brazíliya! A gdye vy zhivyóte siychás?", pt:"Ah, Brasil! E onde mora agora?"},
+      {who:"me", opts:[{cyr:"Сейчас на Ближнем Востоке", tr:"Siychás na Blízhnim Vastóke", pt:"Agora no Oriente Médio", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Интересно! Вы говорите по-русски?", tr:"Intiésna! Vy gavaríte pa-rúski?", pt:"Interessante! Você fala russo?"},
+      {who:"me", opts:[{cyr:"Немного, я учу", tr:"Nimnóga, ya uchú", pt:"Um pouco, estou aprendendo", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Молодец! А кем вы работаете?", tr:"Maladyéts! A kem vy rabótaite?", pt:"Muito bem! E trabalha com o quê?"},
+      {who:"me", opts:[{cyr:"Я тренер по футзалу", tr:"Ya tryéner pa futzálu", pt:"Sou treinador de futsal", ok:true},{cyr:"Красный", tr:"Krásny", pt:"Vermelho", ok:false}]},
+      {who:"them", cyr:"Здорово! Вам нравится Россия?", tr:"Zdórava! Vam nrávitsa Rassíya?", pt:"Legal! Você gosta da Rússia?"},
+      {who:"me", opts:[{cyr:"Да, очень нравится!", tr:"Da, óchin nrávitsa!", pt:"Sim, gosto muito!", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]},
+      {who:"them", cyr:"Сколько вам лет, если не секрет?", tr:"Skólka vam lyet, yésli ni sikryét?", pt:"Quantos anos você tem, se não for segredo?"},
+      {who:"me", opts:[{cyr:"Мне тридцать пять", tr:"Mnye trítsat pyat", pt:"Tenho trinta e cinco", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"У вас есть семья?", tr:"U vas yest simyá?", pt:"Você tem família?"},
+      {who:"me", opts:[{cyr:"Да, жена и дети", tr:"Da, zhiná i dyéti", pt:"Sim, esposa e filhos", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Добро пожаловать! Приятно познакомиться.", tr:"Dabró pazhálavat! Priyátna paznakómitsa.", pt:"Bem-vindo! Prazer em conhecê-lo."},
+      {who:"me", opts:[{cyr:"Спасибо большое! Мне тоже", tr:"Spassíba balshóye! Mnye tózhe", pt:"Muito obrigado! Pra mim também", ok:true},{cyr:"Пока", tr:"Paká", pt:"Tchau", ok:false}]}
+    ]},
+  { afterLevel:7, title:"Educação e gentileza",
+    turns:[
+      {who:"them", cyr:"Ой, извините!", tr:"Oy, izviníte!", pt:"Ops, desculpe!"},
+      {who:"me", opts:[{cyr:"Ничего!", tr:"Nichivó!", pt:"Tudo bem!", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]},
+      {who:"them", cyr:"Я вас не видел. Простите.", tr:"Ya vas ni vídel. Prastíte.", pt:"Não o vi. Perdão."},
+      {who:"me", opts:[{cyr:"Всё в порядке", tr:"Vsyo v paryátke", pt:"Está tudo em ordem", ok:true},{cyr:"Плохо", tr:"Plókha", pt:"Mal", ok:false}]},
+      {who:"them", cyr:"Спасибо за понимание.", tr:"Spassíba za panimániye.", pt:"Obrigado pela compreensão."},
+      {who:"me", opts:[{cyr:"Пожалуйста!", tr:"Pazhálusta!", pt:"De nada!", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Вы не подскажете, который час?", tr:"Vy ni patskázhite, katóry chas?", pt:"Poderia me dizer que horas são?"},
+      {who:"me", opts:[{cyr:"Конечно, сейчас два часа", tr:"Kanyéshna, siychás dva chasá", pt:"Claro, são duas horas", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Большое спасибо! Вы очень добры.", tr:"Balshóye spassíba! Vy óchin dabrý.", pt:"Muito obrigado! Você é muito gentil."},
+      {who:"me", opts:[{cyr:"Не за что!", tr:"Nye za shto!", pt:"Por nada!", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Хорошего вам дня!", tr:"Kharóshiva vam dnya!", pt:"Tenha um bom dia!"},
+      {who:"me", opts:[{cyr:"Спасибо, вам тоже!", tr:"Spassíba, vam tózhe!", pt:"Obrigado, para você também!", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Вы не местный?", tr:"Vy ni myéstny?", pt:"Você não é daqui?"},
+      {who:"me", opts:[{cyr:"Нет, я турист", tr:"Nyet, ya turíst", pt:"Não, sou turista", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Вам нравится наш город?", tr:"Vam nrávitsa nash górat?", pt:"Você gosta da nossa cidade?"},
+      {who:"me", opts:[{cyr:"Да, очень красиво", tr:"Da, óchin krasíva", pt:"Sim, muito bonita", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Если нужна помощь — обращайтесь.", tr:"Yésli nuzhná pómasch — abrascháytis.", pt:"Se precisar de ajuda, me procure."},
+      {who:"me", opts:[{cyr:"Спасибо, вы добры", tr:"Spassíba, vy dabrý", pt:"Obrigado, você é gentil", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]},
+      {who:"them", cyr:"До свидания!", tr:"Da svidániya!", pt:"Até logo!"},
+      {who:"me", opts:[{cyr:"Всего доброго!", tr:"Vsivó dóbrava!", pt:"Tudo de bom!", ok:true},{cyr:"Помогите", tr:"Pamagíte", pt:"Socorro", ok:false}]}
+    ]},
+  { afterLevel:8, title:"Aprendendo a contar",
+    turns:[
+      {who:"them", cyr:"Давай посчитаем! Сколько это?", tr:"Daváy paschitáim! Skólka éta?", pt:"Vamos contar! Quanto é isto?"},
+      {who:"me", opts:[{cyr:"Один!", tr:"Adín!", pt:"Um!", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Правильно! А это?", tr:"Právilna! A éta?", pt:"Correto! E isto?"},
+      {who:"me", opts:[{cyr:"Два!", tr:"Dva!", pt:"Dois!", ok:true},{cyr:"Пока", tr:"Paká", pt:"Tchau", ok:false}]},
+      {who:"them", cyr:"Отлично! Дальше?", tr:"Atlíchna! Dálshe?", pt:"Ótimo! Adiante?"},
+      {who:"me", opts:[{cyr:"Три, четыре, пять!", tr:"Tri, chitýri, pyat!", pt:"Três, quatro, cinco!", ok:true},{cyr:"Вода", tr:"Vadá", pt:"Água", ok:false}]},
+      {who:"them", cyr:"Супер! А после пяти?", tr:"Súper! A pósle pití?", pt:"Demais! E depois do cinco?"},
+      {who:"me", opts:[{cyr:"Шесть, семь, восемь", tr:"Shest, syem, vósim", pt:"Seis, sete, oito", ok:true},{cyr:"Красный", tr:"Krásny", pt:"Vermelho", ok:false}]},
+      {who:"them", cyr:"Молодец! И до десяти?", tr:"Maladyéts! I da disití?", pt:"Muito bem! E até dez?"},
+      {who:"me", opts:[{cyr:"Девять, десять!", tr:"Dyévit, dyésit!", pt:"Nove, dez!", ok:true},{cyr:"Мама", tr:"Máma", pt:"Mãe", ok:false}]},
+      {who:"them", cyr:"Идеально! Ты быстро учишься.", tr:"Idiálna! Ty býstra úchishsya.", pt:"Perfeito! Você aprende rápido."},
+      {who:"me", opts:[{cyr:"Спасибо! Это весело", tr:"Spassíba! Éta vyésila", pt:"Obrigado! Isto é divertido", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]},
+      {who:"them", cyr:"Завтра будем считать до ста!", tr:"Záftra búdim schitát da sta!", pt:"Amanhã contamos até cem!"},
+      {who:"me", opts:[{cyr:"Договорились!", tr:"Dagavarílis!", pt:"Combinado!", ok:true},{cyr:"Холодно", tr:"Khóladna", pt:"Frio", ok:false}]},
+      {who:"them", cyr:"А сколько будет два и три?", tr:"A skólka búdit dva i tri?", pt:"E quanto é dois mais três?"},
+      {who:"me", opts:[{cyr:"Пять!", tr:"Pyat!", pt:"Cinco!", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"А сколько будет пять и пять?", tr:"A skólka búdit pyat i pyat?", pt:"E quanto é cinco mais cinco?"},
+      {who:"me", opts:[{cyr:"Десять!", tr:"Dyésit!", pt:"Dez!", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Умница! Считаешь как профи.", tr:"Úmnitsa! Schitáish kak prófi.", pt:"Esperto! Conta como um profissional."},
+      {who:"me", opts:[{cyr:"Спасибо, мне нравится", tr:"Spassíba, mnye nrávitsa", pt:"Obrigado, eu gosto", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"До завтра, молодец!", tr:"Da záftra, maladyéts!", pt:"Até amanhã, muito bem!"},
+      {who:"me", opts:[{cyr:"До завтра!", tr:"Da záftra!", pt:"Até amanhã!", ok:true},{cyr:"Помогите", tr:"Pamagíte", pt:"Socorro", ok:false}]}
+    ]},
+  { afterLevel:9, title:"Preços e telefone",
+    turns:[
+      {who:"them", cyr:"Здравствуйте! Сколько стоит билет?", tr:"Zdrávstvuyte! Skólka stóit bilyét?", pt:"Olá! Quanto custa o bilhete?"},
+      {who:"me", opts:[{cyr:"Здравствуйте! Сто рублей", tr:"Zdrávstvuyte! Sto rubléy", pt:"Olá! Cem rublos", ok:true},{cyr:"Красный", tr:"Krásny", pt:"Vermelho", ok:false}]},
+      {who:"them", cyr:"А два билета?", tr:"A dva biléta?", pt:"E dois bilhetes?"},
+      {who:"me", opts:[{cyr:"Двести рублей", tr:"Dvésti rubléy", pt:"Duzentos rublos", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Хорошо. Вот деньги.", tr:"Kharashó. Vot dyéngi.", pt:"Ok. Aqui está o dinheiro."},
+      {who:"me", opts:[{cyr:"Спасибо! Вот билеты", tr:"Spassíba! Vot biléty", pt:"Obrigado! Aqui os bilhetes", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Можно ваш номер телефона?", tr:"Mózhna vash nómer tilifóna?", pt:"Pode me dar seu telefone?"},
+      {who:"me", opts:[{cyr:"Конечно: два, пять, ноль...", tr:"Kanyéshna: dva, pyat, nol...", pt:"Claro: dois, cinco, zero...", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Медленнее, пожалуйста!", tr:"Myédlinnie, pazhálusta!", pt:"Mais devagar, por favor!"},
+      {who:"me", opts:[{cyr:"Хорошо: три, один, семь", tr:"Kharashó: tri, adín, syem", pt:"Ok: três, um, sete", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Записал! Спасибо большое.", tr:"Zapisál! Spassíba balshóye.", pt:"Anotei! Muito obrigado."},
+      {who:"me", opts:[{cyr:"Пожалуйста!", tr:"Pazhálusta!", pt:"De nada!", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]},
+      {who:"them", cyr:"Вам нужна квитанция?", tr:"Vam nuzhná kvitántsiya?", pt:"Você precisa de recibo?"},
+      {who:"me", opts:[{cyr:"Да, пожалуйста", tr:"Da, pazhálusta", pt:"Sim, por favor", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Как вас записать?", tr:"Kak vas zapisát?", pt:"Como registro seu nome?"},
+      {who:"me", opts:[{cyr:"Меня зовут Лукас", tr:"Minyá zavút Lukas", pt:"Meu nome é Lucas", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"А по какому адресу вы живёте?", tr:"A pa kakómu ádrisu vy zhivyóte?", pt:"E em que endereço você mora?"},
+      {who:"me", opts:[{cyr:"В центре города", tr:"V tséntre górada", pt:"No centro da cidade", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Отправить чек на телефон?", tr:"Atprávit chek na tilifón?", pt:"Envio o comprovante para o telefone?"},
+      {who:"me", opts:[{cyr:"Да, спасибо", tr:"Da, spassíba", pt:"Sim, obrigado", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Хорошего дня!", tr:"Kharóshiva dnya!", pt:"Bom dia!"},
+      {who:"me", opts:[{cyr:"Вам тоже, до свидания!", tr:"Vam tózhe, da svidániya!", pt:"Para você também, até logo!", ok:true},{cyr:"Помогите", tr:"Pamagíte", pt:"Socorro", ok:false}]}
+    ]},
+  { afterLevel:10, title:"Falando da família",
+    turns:[
+      {who:"them", cyr:"У вас большая семья?", tr:"U vas balsháya simyá?", pt:"Você tem uma família grande?"},
+      {who:"me", opts:[{cyr:"Да, довольно большая", tr:"Da, davólna balsháya", pt:"Sim, bem grande", ok:true},{cyr:"Холодно", tr:"Khóladna", pt:"Frio", ok:false}]},
+      {who:"them", cyr:"Расскажите! У вас есть дети?", tr:"Rasskazhýte! U vas yest dyéti?", pt:"Conte! Você tem filhos?"},
+      {who:"me", opts:[{cyr:"Да, сын и дочь", tr:"Da, syn i doch", pt:"Sim, um filho e uma filha", ok:true},{cyr:"Три", tr:"Tri", pt:"Três", ok:false}]},
+      {who:"them", cyr:"Как мило! А жена?", tr:"Kak míla! A zhiná?", pt:"Que fofo! E esposa?"},
+      {who:"me", opts:[{cyr:"Да, моя жена здесь", tr:"Da, mayá zhiná zdyes", pt:"Sim, minha esposa está aqui", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"А братья или сёстры?", tr:"A brátya íli syóstry?", pt:"E irmãos ou irmãs?"},
+      {who:"me", opts:[{cyr:"У меня есть брат", tr:"U minyá yest brat", pt:"Tenho um irmão", ok:true},{cyr:"Вода", tr:"Vadá", pt:"Água", ok:false}]},
+      {who:"them", cyr:"А родители?", tr:"A radíteli?", pt:"E os pais?"},
+      {who:"me", opts:[{cyr:"Мама и папа в Бразилии", tr:"Máma i pápa v Brazílii", pt:"Mãe e pai no Brasil", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Вы скучаете по ним?", tr:"Vy skucháite pa nim?", pt:"Você sente falta deles?"},
+      {who:"me", opts:[{cyr:"Да, очень", tr:"Da, óchin", pt:"Sim, muito", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"А сколько лет вашим детям?", tr:"A skólka lyet váshim dyétyam?", pt:"Quantos anos têm seus filhos?"},
+      {who:"me", opts:[{cyr:"Пять и восемь", tr:"Pyat i vósim", pt:"Cinco e oito", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Они говорят по-русски?", tr:"Aní gavaryát pa-rúski?", pt:"Eles falam russo?"},
+      {who:"me", opts:[{cyr:"Нет, только я учу", tr:"Nyet, tólka ya uchú", pt:"Não, só eu estudo", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"А ваша жена работает?", tr:"A vásha zhiná rabótait?", pt:"E sua esposa trabalha?"},
+      {who:"me", opts:[{cyr:"Да, она учитель", tr:"Da, aná uchítil", pt:"Sim, ela é professora", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Дружная у вас семья!", tr:"Drúzhnaya u vas simyá!", pt:"Sua família é unida!"},
+      {who:"me", opts:[{cyr:"Да, мы очень близки", tr:"Da, my óchin blizkí", pt:"Sim, somos muito próximos", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Понимаю. Семья — это главное.", tr:"Panimáyu. Simyá — éta glávnaye.", pt:"Entendo. Família é o mais importante."},
+      {who:"me", opts:[{cyr:"Согласен, спасибо", tr:"Saglásin, spassíba", pt:"Concordo, obrigado", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]}
+    ]},
+  { afterLevel:11, title:"Cores por toda parte",
+    turns:[
+      {who:"them", cyr:"Какой ваш любимый цвет?", tr:"Kakóy vash lyubímy tsvet?", pt:"Qual sua cor favorita?"},
+      {who:"me", opts:[{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:true},{cyr:"Завтра", tr:"Záftra", pt:"Amanhã", ok:false}]},
+      {who:"them", cyr:"Красивый цвет! А какого цвета небо?", tr:"Krasívy tsvet! A kakóva tsvéta nyéba?", pt:"Cor bonita! E de que cor é o céu?"},
+      {who:"me", opts:[{cyr:"Небо синее", tr:"Nyéba síneye", pt:"O céu é azul", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Верно! А трава?", tr:"Vyérna! A travá?", pt:"Certo! E a grama?"},
+      {who:"me", opts:[{cyr:"Трава зелёная", tr:"Travá zilyónaya", pt:"A grama é verde", ok:true},{cyr:"Мясо", tr:"Myása", pt:"Carne", ok:false}]},
+      {who:"them", cyr:"А солнце?", tr:"A sóntse?", pt:"E o sol?"},
+      {who:"me", opts:[{cyr:"Солнце жёлтое", tr:"Sóntse zhóltaye", pt:"O sol é amarelo", ok:true},{cyr:"Пока", tr:"Paká", pt:"Tchau", ok:false}]},
+      {who:"them", cyr:"Отлично! А какого цвета ваш мяч?", tr:"Atlíchna! A kakóva tsvéta vash myach?", pt:"Ótimo! E de que cor é sua bola?"},
+      {who:"me", opts:[{cyr:"Красный и белый", tr:"Krásny i bély", pt:"Vermelho e branco", ok:true},{cyr:"Холодно", tr:"Khóladna", pt:"Frio", ok:false}]},
+      {who:"them", cyr:"А ночь какого цвета?", tr:"A noch kakóva tsvéta?", pt:"E a noite, de que cor?"},
+      {who:"me", opts:[{cyr:"Ночь чёрная", tr:"Noch chórnaya", pt:"A noite é preta", ok:true},{cyr:"Три", tr:"Tri", pt:"Três", ok:false}]},
+      {who:"them", cyr:"А какого цвета ваша машина?", tr:"A kakóva tsvéta vásha mashýna?", pt:"De que cor é o seu carro?"},
+      {who:"me", opts:[{cyr:"Белая", tr:"Bélaya", pt:"Branco", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"А ваш дом?", tr:"A vash dom?", pt:"E a sua casa?"},
+      {who:"me", opts:[{cyr:"Дом жёлтый", tr:"Dom zhólty", pt:"A casa é amarela", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"А какой цвет вы не любите?", tr:"A kakóy tsvet vy ni lyúbite?", pt:"E qual cor você não gosta?"},
+      {who:"me", opts:[{cyr:"Не люблю чёрный", tr:"Ni lyublyú chórny", pt:"Não gosto de preto", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Интересно! У вас хороший вкус.", tr:"Intiésna! U vas kharóshy fkus.", pt:"Interessante! Você tem bom gosto."},
+      {who:"me", opts:[{cyr:"Спасибо большое!", tr:"Spassíba balshóye!", pt:"Muito obrigado!", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Вы отлично знаете цвета!", tr:"Vy atlíchna znáite tsvitá!", pt:"Você conhece bem as cores!"},
+      {who:"me", opts:[{cyr:"Спасибо! Было интересно", tr:"Spassíba! Býla intiésna", pt:"Obrigado! Foi interessante", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]}
+    ]},
+  { afterLevel:12, title:"Que horas são?",
+    turns:[
+      {who:"them", cyr:"Извините, который час?", tr:"Izviníte, katóry chas?", pt:"Desculpe, que horas são?"},
+      {who:"me", opts:[{cyr:"Сейчас три часа", tr:"Siychás tri chasá", pt:"Agora são três horas", ok:true},{cyr:"Зелёный", tr:"Zilyóny", pt:"Verde", ok:false}]},
+      {who:"them", cyr:"Спасибо! А какой сегодня день?", tr:"Spassíba! A kakóy sivódnya den?", pt:"Obrigado! E que dia é hoje?"},
+      {who:"me", opts:[{cyr:"Сегодня понедельник", tr:"Sivódnya panidyélnik", pt:"Hoje é segunda", ok:true},{cyr:"Вода", tr:"Vadá", pt:"Água", ok:false}]},
+      {who:"them", cyr:"Точно. А завтра у вас есть время?", tr:"Tóchna. A záftra u vas yest vryémya?", pt:"Exato. E amanhã você tem tempo?"},
+      {who:"me", opts:[{cyr:"Да, завтра свободен", tr:"Da, záftra svabódin", pt:"Sim, amanhã estou livre", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Отлично! Встретимся в пять?", tr:"Atlíchna! Fstryétimsya v pyat?", pt:"Ótimo! Nos vemos às cinco?"},
+      {who:"me", opts:[{cyr:"Да, в пять хорошо", tr:"Da, v pyat kharashó", pt:"Sim, às cinco está bom", ok:true},{cyr:"Красный", tr:"Krásny", pt:"Vermelho", ok:false}]},
+      {who:"them", cyr:"А где встретимся?", tr:"A gdye fstryétimsya?", pt:"E onde nos vemos?"},
+      {who:"me", opts:[{cyr:"У метро", tr:"U mitró", pt:"No metrô", ok:true},{cyr:"Мама", tr:"Máma", pt:"Mãe", ok:false}]},
+      {who:"them", cyr:"А что вы делаете вечером?", tr:"A shto vy dyélaite vyécheram?", pt:"E o que você faz à noite?"},
+      {who:"me", opts:[{cyr:"Отдыхаю дома", tr:"Addykháyu dóma", pt:"Descanso em casa", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Хотите вместе поужинать?", tr:"Khatíte vmésti pauzhinat?", pt:"Quer jantar junto?"},
+      {who:"me", opts:[{cyr:"Да, с удовольствием", tr:"Da, s udavólstviyem", pt:"Sim, com prazer", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"А во сколько вы обычно ужинаете?", tr:"A va skólka vy abýchna uzhináite?", pt:"E a que horas você costuma jantar?"},
+      {who:"me", opts:[{cyr:"В семь часов", tr:"V syem chasóf", pt:"Às sete horas", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Тогда до вечера!", tr:"Tagdá da vyéchira!", pt:"Então até a noite!"},
+      {who:"me", opts:[{cyr:"До вечера!", tr:"Da vyéchira!", pt:"Até a noite!", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Не опаздывайте!", tr:"Ni apázdyvayte!", pt:"Não se atrase!"},
+      {who:"me", opts:[{cyr:"Не буду, обещаю", tr:"Ni búdu, abischáyu", pt:"Não vou, prometo", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Договорились! До завтра.", tr:"Dagavarílis! Da záftra.", pt:"Combinado! Até amanhã."},
+      {who:"me", opts:[{cyr:"До завтра!", tr:"Da záftra!", pt:"Até amanhã!", ok:true},{cyr:"Помогите", tr:"Pamagíte", pt:"Socorro", ok:false}]}
+    ]},
+  { afterLevel:12, title:"Planos da semana",
+    turns:[
+      {who:"them", cyr:"Что вы делаете на этой неделе?", tr:"Shto vy dyélaite na état nidyéle?", pt:"O que você faz nesta semana?"},
+      {who:"me", opts:[{cyr:"В понедельник работаю", tr:"V panidyélnik rabótayu", pt:"Na segunda trabalho", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"А во вторник?", tr:"A va ftórnik?", pt:"E na terça?"},
+      {who:"me", opts:[{cyr:"Во вторник тренировка", tr:"Va ftórnik triniróvka", pt:"Na terça, treino", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Понятно. А в среду свободны?", tr:"Panyátna. A v sryédu svabódny?", pt:"Entendi. E na quarta está livre?"},
+      {who:"me", opts:[{cyr:"Да, в среду свободен", tr:"Da, v sryédu svabódin", pt:"Sim, na quarta estou livre", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Тогда встретимся в среду?", tr:"Tagdá fstryétimsya v sryédu?", pt:"Então nos vemos na quarta?"},
+      {who:"me", opts:[{cyr:"Хорошо, в котором часу?", tr:"Kharashó, f katóram chasú?", pt:"Ok, a que horas?", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"В десять утра.", tr:"V dyésit utrá.", pt:"Às dez da manhã."},
+      {who:"me", opts:[{cyr:"Отлично, договорились", tr:"Atlíchna, dagavarílis", pt:"Ótimo, combinado", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]},
+      {who:"them", cyr:"А в выходные?", tr:"A v vykhadnýe?", pt:"E no fim de semana?"},
+      {who:"me", opts:[{cyr:"В выходные отдыхаю", tr:"V vykhadnýe addykháyu", pt:"No fim de semana descanso", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Любите спорт?", tr:"Lyúbite sport?", pt:"Você gosta de esporte?"},
+      {who:"me", opts:[{cyr:"Да, очень", tr:"Da, óchin", pt:"Sim, muito", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Какой спорт вы любите?", tr:"Kakóy sport vy lyúbite?", pt:"Qual esporte você gosta?"},
+      {who:"me", opts:[{cyr:"Мини-футбол", tr:"Míni-futból", pt:"Futsal", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"А в четверг что делаете?", tr:"A v chitvyérk shto dyélaite?", pt:"E na quinta o que faz?"},
+      {who:"me", opts:[{cyr:"В четверг тренировка", tr:"V chitvyérk triniróvka", pt:"Na quinta, treino", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Вы очень занятой человек!", tr:"Vy óchin zanitóy chilavyék!", pt:"Você é muito ocupado!"},
+      {who:"me", opts:[{cyr:"Да, но мне нравится", tr:"Da, no mnye nrávitsa", pt:"Sim, mas eu gosto", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Супер! До среды.", tr:"Súper! Da sriédy.", pt:"Demais! Até quarta."},
+      {who:"me", opts:[{cyr:"До среды, до встречи!", tr:"Da sriédy, da fstryéchi!", pt:"Até quarta, até logo!", ok:true},{cyr:"Холодно", tr:"Khóladna", pt:"Frio", ok:false}]}
+    ]},
+  { afterLevel:13, title:"Hora de comer",
+    turns:[
+      {who:"them", cyr:"Вы голодны?", tr:"Vy góladny?", pt:"Você está com fome?"},
+      {who:"me", opts:[{cyr:"Да, очень хочу есть", tr:"Da, óchin khachú yest", pt:"Sim, quero muito comer", ok:true},{cyr:"Снег", tr:"Snyek", pt:"Neve", ok:false}]},
+      {who:"them", cyr:"Что вы любите?", tr:"Shto vy lyúbite?", pt:"Do que você gosta?"},
+      {who:"me", opts:[{cyr:"Я люблю мясо", tr:"Ya lyublyú myása", pt:"Eu gosto de carne", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"А рыбу?", tr:"A rýbu?", pt:"E peixe?"},
+      {who:"me", opts:[{cyr:"Рыбу тоже люблю", tr:"Rýbu tózhe lyublyú", pt:"Peixe também gosto", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Хотите хлеб?", tr:"Khatíte khlyeb?", pt:"Quer pão?"},
+      {who:"me", opts:[{cyr:"Да, немного хлеба", tr:"Da, nimnóga khlyéba", pt:"Sim, um pouco de pão", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"А что будете пить?", tr:"A shto búdite pit?", pt:"E o que vai beber?"},
+      {who:"me", opts:[{cyr:"Воду, пожалуйста", tr:"Vádu, pazhálusta", pt:"Água, por favor", ok:true},{cyr:"Красный", tr:"Krásny", pt:"Vermelho", ok:false}]},
+      {who:"them", cyr:"Вот, кушайте на здоровье!", tr:"Vot, kúshayte na zdaróvye!", pt:"Pronto, coma com saúde!"},
+      {who:"me", opts:[{cyr:"Спасибо! Очень вкусно", tr:"Spassíba! Óchin fkúsna", pt:"Obrigado! Muito gostoso", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]},
+      {who:"them", cyr:"Хотите фрукты на десерт?", tr:"Khatíte frúkty na disyért?", pt:"Quer frutas de sobremesa?"},
+      {who:"me", opts:[{cyr:"Да, пожалуйста", tr:"Da, pazhálusta", pt:"Sim, por favor", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Ещё чаю?", tr:"Yeschó cháyu?", pt:"Mais chá?"},
+      {who:"me", opts:[{cyr:"Да, немного", tr:"Da, nimnóga", pt:"Sim, um pouco", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Вам понравилась еда?", tr:"Vam panrávilas yidá?", pt:"Você gostou da comida?"},
+      {who:"me", opts:[{cyr:"Очень вкусно, спасибо", tr:"Óchin fkúsna, spassíba", pt:"Muito gostosa, obrigado", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Приходите ещё в гости!", tr:"Prikhadíte yeschó v gósti!", pt:"Volte para nos visitar!"},
+      {who:"me", opts:[{cyr:"С удовольствием!", tr:"S udavólstviyem!", pt:"Com prazer!", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Приятного аппетита!", tr:"Priyátnava apitíta!", pt:"Bom apetite!"},
+      {who:"me", opts:[{cyr:"Спасибо большое!", tr:"Spassíba balshóye!", pt:"Muito obrigado!", ok:true},{cyr:"Пока", tr:"Paká", pt:"Tchau", ok:false}]}
+    ]},
+  { afterLevel:14, title:"No café",
+    turns:[
+      {who:"them", cyr:"Здравствуйте! Что вы хотите?", tr:"Zdrávstvuyte! Shto vy khatíte?", pt:"Olá! O que deseja?"},
+      {who:"me", opts:[{cyr:"Кофе, пожалуйста", tr:"Kófe, pazhálusta", pt:"Um café, por favor", ok:true},{cyr:"Налево", tr:"Nalyéva", pt:"À esquerda", ok:false}]},
+      {who:"them", cyr:"Большой или маленький?", tr:"Balshóy íli málinky?", pt:"Grande ou pequeno?"},
+      {who:"me", opts:[{cyr:"Большой, пожалуйста", tr:"Balshóy, pazhálusta", pt:"Grande, por favor", ok:true},{cyr:"Снег", tr:"Snyek", pt:"Neve", ok:false}]},
+      {who:"them", cyr:"С молоком?", tr:"S malakóm?", pt:"Com leite?"},
+      {who:"me", opts:[{cyr:"Да, с молоком", tr:"Da, s malakóm", pt:"Sim, com leite", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Что-нибудь ещё? Есть хлеб.", tr:"Shto-nibut yeschó? Yest khlyeb.", pt:"Mais alguma coisa? Temos pão."},
+      {who:"me", opts:[{cyr:"Да, хлеб тоже", tr:"Da, khlyeb tózhe", pt:"Sim, pão também", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Отлично. С вас триста рублей.", tr:"Atlíchna. S vas trísta rubléy.", pt:"Ótimo. São trezentos rublos."},
+      {who:"me", opts:[{cyr:"Вот, пожалуйста", tr:"Vot, pazhálusta", pt:"Aqui está", ok:true},{cyr:"Где?", tr:"Gdye?", pt:"Onde?", ok:false}]},
+      {who:"them", cyr:"Спасибо! Ваш кофе готов.", tr:"Spassíba! Vash kófe gatóf.", pt:"Obrigado! Seu café está pronto."},
+      {who:"me", opts:[{cyr:"Спасибо! Очень вкусно", tr:"Spassíba! Óchin fkúsna", pt:"Obrigado! Muito gostoso", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]},
+      {who:"them", cyr:"Вам здесь или с собой?", tr:"Vam zdyes íli s sabóy?", pt:"Para tomar aqui ou para viagem?"},
+      {who:"me", opts:[{cyr:"Здесь, спасибо", tr:"Zdyes, spassíba", pt:"Aqui, obrigado", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Есть свежий хлеб. Хотите?", tr:"Yest svyézhy khlyeb. Khatíte?", pt:"Tem pão fresco. Quer?"},
+      {who:"me", opts:[{cyr:"Да, один, пожалуйста", tr:"Da, adín, pazhálusta", pt:"Sim, um, por favor", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Сахар нужен?", tr:"Sákhar núzhen?", pt:"Precisa de açúcar?"},
+      {who:"me", opts:[{cyr:"Нет, спасибо", tr:"Nyet, spassíba", pt:"Não, obrigado", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Присаживайтесь, я принесу.", tr:"Prisázhivaytis, ya prinisú.", pt:"Sente-se, eu trago."},
+      {who:"me", opts:[{cyr:"Спасибо большое!", tr:"Spassíba balshóye!", pt:"Muito obrigado!", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Приятного дня!", tr:"Priyátnava dnya!", pt:"Tenha um bom dia!"},
+      {who:"me", opts:[{cyr:"Вам тоже!", tr:"Vam tózhe!", pt:"Para você também!", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]}
+    ]},
+  { afterLevel:14, title:"Jantar no restaurante",
+    turns:[
+      {who:"them", cyr:"Добрый вечер! Столик на одного?", tr:"Dóbryy vécher! Stólik na adnavó?", pt:"Boa noite! Mesa para um?"},
+      {who:"me", opts:[{cyr:"Да, на одного", tr:"Da, na adnavó", pt:"Sim, para um", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Вот меню. Что будете?", tr:"Vot minyú. Shto búdite?", pt:"Aqui o cardápio. O que vai querer?"},
+      {who:"me", opts:[{cyr:"Рыбу, пожалуйста", tr:"Rýbu, pazhálusta", pt:"Peixe, por favor", ok:true},{cyr:"Налево", tr:"Nalyéva", pt:"À esquerda", ok:false}]},
+      {who:"them", cyr:"Отличный выбор! А на гарнир?", tr:"Atlíchny výbar! A na garnír?", pt:"Ótima escolha! E de acompanhamento?"},
+      {who:"me", opts:[{cyr:"Хлеб, пожалуйста", tr:"Khlyeb, pazhálusta", pt:"Pão, por favor", ok:true},{cyr:"Брат", tr:"Brat", pt:"Irmão", ok:false}]},
+      {who:"them", cyr:"Что будете пить?", tr:"Shto búdite pit?", pt:"O que vai beber?"},
+      {who:"me", opts:[{cyr:"Воду без газа", tr:"Vádu bez gáza", pt:"Água sem gás", ok:true},{cyr:"Красный", tr:"Krásny", pt:"Vermelho", ok:false}]},
+      {who:"them", cyr:"Хорошо. Одну минуту.", tr:"Kharashó. Adnú minútu.", pt:"Ok. Um minuto."},
+      {who:"me", opts:[{cyr:"Спасибо", tr:"Spassíba", pt:"Obrigado", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]},
+      {who:"them", cyr:"Вот ваше блюдо. Приятного аппетита!", tr:"Vot váshe blyúda. Priyátnava apitíta!", pt:"Aqui seu prato. Bom apetite!"},
+      {who:"me", opts:[{cyr:"Спасибо! Выглядит вкусно", tr:"Spassíba! Výglidit fkúsna", pt:"Obrigado! Parece gostoso", ok:true},{cyr:"Пока", tr:"Paká", pt:"Tchau", ok:false}]},
+      {who:"them", cyr:"Вам понравилось?", tr:"Vam panrávilas?", pt:"Você gostou?"},
+      {who:"me", opts:[{cyr:"Да, всё было вкусно", tr:"Da, vsyo býla fkúsna", pt:"Sim, tudo estava gostoso", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Хотите десерт?", tr:"Khatíte disyért?", pt:"Quer sobremesa?"},
+      {who:"me", opts:[{cyr:"Нет, спасибо, я сыт", tr:"Nyet, spassíba, ya syt", pt:"Não, obrigado, estou satisfeito", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Как вам обслуживание?", tr:"Kak vam abslúzhivaniye?", pt:"Como foi o atendimento?"},
+      {who:"me", opts:[{cyr:"Отличное, спасибо", tr:"Atlíchnaye, spassíba", pt:"Excelente, obrigado", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Приходите к нам снова!", tr:"Prikhadíte k nam snóva!", pt:"Volte sempre!"},
+      {who:"me", opts:[{cyr:"Обязательно приду", tr:"Abizátilna pridú", pt:"Com certeza voltarei", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Всё хорошо? Нужно ещё что-то?", tr:"Vsyo kharashó? Núzhna yeschó shto-ta?", pt:"Está tudo bem? Precisa de mais algo?"},
+      {who:"me", opts:[{cyr:"Всё отлично. Счёт, пожалуйста", tr:"Vsyo atlíchna. Schot, pazhálusta", pt:"Tudo ótimo. A conta, por favor", ok:true},{cyr:"Холодно", tr:"Khóladna", pt:"Frio", ok:false}]}
+    ]},
+  { afterLevel:15, title:"Compras no mercado",
+    turns:[
+      {who:"them", cyr:"Здравствуйте! Что вам нужно?", tr:"Zdrávstvuyte! Shto vam núzhna?", pt:"Olá! Do que precisa?"},
+      {who:"me", opts:[{cyr:"Мне нужен хлеб", tr:"Mnye núzhen khlyeb", pt:"Preciso de pão", ok:true},{cyr:"Жарко", tr:"Zhárka", pt:"Quente", ok:false}]},
+      {who:"them", cyr:"Вот хлеб. Ещё что-то?", tr:"Vot khlyeb. Yeschó shto-ta?", pt:"Aqui o pão. Mais algo?"},
+      {who:"me", opts:[{cyr:"Да, воду и фрукты", tr:"Da, vádu i frúkty", pt:"Sim, água e frutas", ok:true},{cyr:"Понедельник", tr:"Panidyélnik", pt:"Segunda", ok:false}]},
+      {who:"them", cyr:"Какие фрукты?", tr:"Kakíye frúkty?", pt:"Quais frutas?"},
+      {who:"me", opts:[{cyr:"Не знаю, что есть?", tr:"Ni znáyu, shto yest?", pt:"Não sei, o que tem?", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Есть яблоки. Красные и зелёные.", tr:"Yest yáblaki. Krásnye i zilyónye.", pt:"Tem maçãs. Vermelhas e verdes."},
+      {who:"me", opts:[{cyr:"Красные, пожалуйста", tr:"Krásnye, pazhálusta", pt:"Vermelhas, por favor", ok:true},{cyr:"Мама", tr:"Máma", pt:"Mãe", ok:false}]},
+      {who:"them", cyr:"Хорошо. Сколько?", tr:"Kharashó. Skólka?", pt:"Ok. Quantas?"},
+      {who:"me", opts:[{cyr:"Пять, пожалуйста", tr:"Pyat, pazhálusta", pt:"Cinco, por favor", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Всё вместе двести рублей.", tr:"Vsyo vmésti dvésti rubléy.", pt:"Tudo junto duzentos rublos."},
+      {who:"me", opts:[{cyr:"Вот, я беру", tr:"Vot, ya birú", pt:"Aqui, eu levo", ok:true},{cyr:"Пока", tr:"Paká", pt:"Tchau", ok:false}]},
+      {who:"them", cyr:"Пакет нужен?", tr:"Pakyét núzhen?", pt:"Precisa de sacola?"},
+      {who:"me", opts:[{cyr:"Да, один пакет", tr:"Da, adín pakyét", pt:"Sim, uma sacola", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Молоко нужно?", tr:"Malakó núzhna?", pt:"Precisa de leite?"},
+      {who:"me", opts:[{cyr:"Да, одну бутылку", tr:"Da, adnú butýlku", pt:"Sim, uma garrafa", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"А сыр?", tr:"A syr?", pt:"E queijo?"},
+      {who:"me", opts:[{cyr:"Нет, спасибо", tr:"Nyet, spassíba", pt:"Não, obrigado", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Что-то ещё?", tr:"Shto-ta yeschó?", pt:"Mais alguma coisa?"},
+      {who:"me", opts:[{cyr:"Нет, это всё", tr:"Nyet, éta vsyo", pt:"Não, é só isso", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Спасибо! Приходите ещё.", tr:"Spassíba! Prikhadíte yeschó.", pt:"Obrigado! Volte sempre."},
+      {who:"me", opts:[{cyr:"Спасибо, до свидания!", tr:"Spassíba, da svidániya!", pt:"Obrigado, até logo!", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]}
+    ]},
+  { afterLevel:15, title:"Comprando roupa",
+    turns:[
+      {who:"them", cyr:"Добрый день! Вам помочь?", tr:"Dóbryy den! Vam pamóch?", pt:"Boa tarde! Posso ajudar?"},
+      {who:"me", opts:[{cyr:"Да, спасибо", tr:"Da, spassíba", pt:"Sim, obrigado", ok:true},{cyr:"Врач", tr:"Vrach", pt:"Médico", ok:false}]},
+      {who:"them", cyr:"Что вы ищете?", tr:"Shto vy íschite?", pt:"O que procura?"},
+      {who:"me", opts:[{cyr:"Что-то синее", tr:"Shto-ta síneye", pt:"Algo azul", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Вот, посмотрите. Нравится?", tr:"Vot, pasmatríte. Nrávitsa?", pt:"Aqui, veja. Gosta?"},
+      {who:"me", opts:[{cyr:"Да, красиво! Сколько стоит?", tr:"Da, krasíva! Skólka stóit?", pt:"Sim, bonito! Quanto custa?", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Тысяча рублей.", tr:"Týsicha rubléy.", pt:"Mil rublos."},
+      {who:"me", opts:[{cyr:"Ой, это дорого", tr:"Oy, éta dóraga", pt:"Ah, isso é caro", ok:true},{cyr:"Спасибо", tr:"Spassíba", pt:"Obrigado", ok:false}]},
+      {who:"them", cyr:"Есть скидка. Восемьсот.", tr:"Yest skítka. Vasimsót.", pt:"Tem desconto. Oitocentos."},
+      {who:"me", opts:[{cyr:"Так лучше. Я беру!", tr:"Tak lúchshe. Ya birú!", pt:"Assim é melhor. Eu levo!", ok:true},{cyr:"Холодно", tr:"Khóladna", pt:"Frio", ok:false}]},
+      {who:"them", cyr:"Какой у вас размер?", tr:"Kakóy u vas razmyér?", pt:"Qual é o seu tamanho?"},
+      {who:"me", opts:[{cyr:"Не знаю точно", tr:"Ni znáyu tóchna", pt:"Não sei ao certo", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Хотите примерить?", tr:"Khatíte primyérit?", pt:"Quer experimentar?"},
+      {who:"me", opts:[{cyr:"Да, где примерочная?", tr:"Da, gdye primyérachnaya?", pt:"Sim, onde é o provador?", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Как вам размер?", tr:"Kak vam razmyér?", pt:"Como ficou o tamanho?"},
+      {who:"me", opts:[{cyr:"Отлично, подходит", tr:"Atlíchna, patkhódit", pt:"Ótimo, serve", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Хотите другой цвет?", tr:"Khatíte drugóy tsvet?", pt:"Quer outra cor?"},
+      {who:"me", opts:[{cyr:"Нет, синий отличный", tr:"Nyet, síniy atlíchny", pt:"Não, o azul é ótimo", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Оплата картой или наличными?", tr:"Aplláta kártay íli nalíchnymi?", pt:"Pagamento no cartão ou dinheiro?"},
+      {who:"me", opts:[{cyr:"Наличными", tr:"Nalíchnymi", pt:"Dinheiro", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Отличный выбор! Спасибо.", tr:"Atlíchny výbar! Spassíba.", pt:"Ótima escolha! Obrigado."},
+      {who:"me", opts:[{cyr:"Спасибо вам!", tr:"Spassíba vam!", pt:"Obrigado a você!", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]}
+    ]},
+  { afterLevel:16, title:"Achando o caminho",
+    turns:[
+      {who:"them", cyr:"Вы выглядите потерянным. Вам помочь?", tr:"Vy výglidite patyéryannym. Vam pamóch?", pt:"Você parece perdido. Ajudo?"},
+      {who:"me", opts:[{cyr:"Да, где метро?", tr:"Da, gdye mitró?", pt:"Sim, onde é o metrô?", ok:true},{cyr:"Спасибо", tr:"Spassíba", pt:"Obrigado", ok:false}]},
+      {who:"them", cyr:"Идите прямо.", tr:"Idíte pryáma.", pt:"Vá em frente."},
+      {who:"me", opts:[{cyr:"Прямо, а потом?", tr:"Pryáma, a patóm?", pt:"Reto, e depois?", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Потом налево.", tr:"Patóm nalyéva.", pt:"Depois à esquerda."},
+      {who:"me", opts:[{cyr:"Налево, понял", tr:"Nalyéva, pónyal", pt:"À esquerda, entendi", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Метро будет справа.", tr:"Mitró búdit správa.", pt:"O metrô estará à direita."},
+      {who:"me", opts:[{cyr:"Это далеко?", tr:"Éta dalikó?", pt:"É longe?", ok:true},{cyr:"Мама", tr:"Máma", pt:"Mãe", ok:false}]},
+      {who:"them", cyr:"Нет, пять минут.", tr:"Nyet, pyat minút.", pt:"Não, cinco minutos."},
+      {who:"me", opts:[{cyr:"Отлично, спасибо!", tr:"Atlíchna, spassíba!", pt:"Ótimo, obrigado!", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Вам туда одному идти?", tr:"Vam tudá adnamú ittí?", pt:"Vai sozinho para lá?"},
+      {who:"me", opts:[{cyr:"Да, спасибо", tr:"Da, spassíba", pt:"Sim, obrigado", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Осторожно, там дорога.", tr:"Astarózhna, tam daróga.", pt:"Cuidado, ali tem uma rua."},
+      {who:"me", opts:[{cyr:"Хорошо, буду внимателен", tr:"Kharashó, búdu vnimátilen", pt:"Ok, ficarei atento", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Хотите, покажу на карте?", tr:"Khatíte, pakazhú na kárte?", pt:"Quer que eu mostre no mapa?"},
+      {who:"me", opts:[{cyr:"Да, пожалуйста", tr:"Da, pazhálusta", pt:"Sim, por favor", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Вот, смотрите: вы здесь.", tr:"Vot, smatríte: vy zdyes.", pt:"Olhe: você está aqui."},
+      {who:"me", opts:[{cyr:"Понятно, спасибо!", tr:"Panyátna, spassíba!", pt:"Entendi, obrigado!", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Не заблудитесь!", tr:"Ni zabludítis!", pt:"Não se perca!"},
+      {who:"me", opts:[{cyr:"Постараюсь!", tr:"Pastaráyus!", pt:"Vou tentar!", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Не за что! Удачи.", tr:"Nye za shto! Udáchi.", pt:"Por nada! Boa sorte."},
+      {who:"me", opts:[{cyr:"До свидания!", tr:"Da svidániya!", pt:"Até logo!", ok:true},{cyr:"Жарко", tr:"Zhárka", pt:"Quente", ok:false}]}
+    ]},
+  { afterLevel:17, title:"Táxi para o aeroporto",
+    turns:[
+      {who:"them", cyr:"Здравствуйте! Куда едем?", tr:"Zdrávstvuyte! Kudá yédim?", pt:"Olá! Para onde vamos?"},
+      {who:"me", opts:[{cyr:"В аэропорт, пожалуйста", tr:"V aeropórt, pazhálusta", pt:"Ao aeroporto, por favor", ok:true},{cyr:"Зелёный", tr:"Zilyóny", pt:"Verde", ok:false}]},
+      {who:"them", cyr:"Хорошо. У вас много багажа?", tr:"Kharashó. U vas mnóga bagazhá?", pt:"Ok. Você tem muita bagagem?"},
+      {who:"me", opts:[{cyr:"Нет, один чемодан", tr:"Nyet, adín chimadán", pt:"Não, uma mala", ok:true},{cyr:"Мама", tr:"Máma", pt:"Mãe", ok:false}]},
+      {who:"them", cyr:"Понял. Это далеко, минут сорок.", tr:"Pónyal. Éta dalikó, minút sórak.", pt:"Entendi. É longe, uns quarenta minutos."},
+      {who:"me", opts:[{cyr:"Сколько это будет стоить?", tr:"Skólka éta búdit stóit?", pt:"Quanto vai custar?", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Восемьсот рублей.", tr:"Vasimsót rubléy.", pt:"Oitocentos rublos."},
+      {who:"me", opts:[{cyr:"Хорошо, поехали", tr:"Kharashó, payékhali", pt:"Ok, vamos", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Вы спешите на самолёт?", tr:"Vy spishíte na samalyót?", pt:"Você está com pressa para o voo?"},
+      {who:"me", opts:[{cyr:"Да, немного", tr:"Da, nimnóga", pt:"Sim, um pouco", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]},
+      {who:"them", cyr:"Не волнуйтесь, успеем.", tr:"Ni valnúytis, uspéim.", pt:"Não se preocupe, chegamos a tempo."},
+      {who:"me", opts:[{cyr:"Спасибо большое!", tr:"Spassíba balshóye!", pt:"Muito obrigado!", ok:true},{cyr:"Холодно", tr:"Khóladna", pt:"Frio", ok:false}]},
+      {who:"them", cyr:"Включить кондиционер?", tr:"Fklyuchít kandistianyér?", pt:"Ligo o ar-condicionado?"},
+      {who:"me", opts:[{cyr:"Да, пожалуйста, жарко", tr:"Da, pazhálusta, zhárka", pt:"Sim, por favor, está quente", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Какую музыку хотите?", tr:"Kakúyu múzyku khatíte?", pt:"Que música você quer?"},
+      {who:"me", opts:[{cyr:"Всё равно, спасибо", tr:"Vsyo ravnó, spassíba", pt:"Tanto faz, obrigado", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Вы надолго летите?", tr:"Vy nadólga litíte?", pt:"Você viaja por muito tempo?"},
+      {who:"me", opts:[{cyr:"На десять дней", tr:"Na dyésit dnyey", pt:"Por dez dias", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Хорошей поездки!", tr:"Kharóshey payéztki!", pt:"Boa viagem!"},
+      {who:"me", opts:[{cyr:"Спасибо большое!", tr:"Spassíba balshóye!", pt:"Muito obrigado!", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Приехали! Счастливого пути.", tr:"Priyékhali! Schaslíva putí.", pt:"Chegamos! Boa viagem."},
+      {who:"me", opts:[{cyr:"Спасибо! До свидания", tr:"Spassíba! Da svidániya", pt:"Obrigado! Até logo", ok:true},{cyr:"Пока... нет", tr:"...", pt:"...", ok:false}]}
+    ]},
+  { afterLevel:17, title:"No aeroporto",
+    turns:[
+      {who:"them", cyr:"Здравствуйте! Ваш паспорт, пожалуйста.", tr:"Zdrávstvuyte! Vash páspart, pazhálusta.", pt:"Olá! Seu passaporte, por favor."},
+      {who:"me", opts:[{cyr:"Вот, пожалуйста", tr:"Vot, pazhálusta", pt:"Aqui está", ok:true},{cyr:"Дождь", tr:"Dozht", pt:"Chuva", ok:false}]},
+      {who:"them", cyr:"Куда вы летите?", tr:"Kudá vy litíte?", pt:"Para onde você voa?"},
+      {who:"me", opts:[{cyr:"В Москву", tr:"V Maskvú", pt:"Para Moscou", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Цель поездки?", tr:"Tsel payéztki?", pt:"Motivo da viagem?"},
+      {who:"me", opts:[{cyr:"Работа, я тренер", tr:"Rabóta, ya tryéner", pt:"Trabalho, sou treinador", ok:true},{cyr:"Красный", tr:"Krásny", pt:"Vermelho", ok:false}]},
+      {who:"them", cyr:"Сколько дней вы будете здесь?", tr:"Skólka dnyey vy búdite zdyes?", pt:"Quantos dias você fica aqui?"},
+      {who:"me", opts:[{cyr:"Десять дней", tr:"Dyésit dnyey", pt:"Dez dias", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"У вас есть багаж?", tr:"U vas yest bagázh?", pt:"Você tem bagagem?"},
+      {who:"me", opts:[{cyr:"Да, один чемодан", tr:"Da, adín chimadán", pt:"Sim, uma mala", ok:true},{cyr:"Мама", tr:"Máma", pt:"Mãe", ok:false}]},
+      {who:"them", cyr:"Хорошо. Всё в порядке.", tr:"Kharashó. Vsyo v paryátke.", pt:"Ok. Está tudo em ordem."},
+      {who:"me", opts:[{cyr:"Спасибо большое!", tr:"Spassíba balshóye!", pt:"Muito obrigado!", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]},
+      {who:"them", cyr:"Поставьте сумку сюда.", tr:"Pastávte súmku syudá.", pt:"Coloque a bolsa aqui."},
+      {who:"me", opts:[{cyr:"Хорошо, вот", tr:"Kharashó, vot", pt:"Ok, aqui", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Проходите к выходу пять.", tr:"Prakhadíte k výkhadu pyat.", pt:"Vá até o portão cinco."},
+      {who:"me", opts:[{cyr:"Спасибо, понял", tr:"Spassíba, pónyal", pt:"Obrigado, entendi", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"У вас есть обратный билет?", tr:"U vas yest abrátny bilyét?", pt:"Você tem passagem de volta?"},
+      {who:"me", opts:[{cyr:"Да, вот он", tr:"Da, vot on", pt:"Sim, aqui está", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Хорошего полёта!", tr:"Kharóshiva palyóta!", pt:"Bom voo!"},
+      {who:"me", opts:[{cyr:"Спасибо!", tr:"Spassíba!", pt:"Obrigado!", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Добро пожаловать в Россию!", tr:"Dabró pazhálavat v Rassíyu!", pt:"Bem-vindo à Rússia!"},
+      {who:"me", opts:[{cyr:"Спасибо! Очень рад", tr:"Spassíba! Óchin rat", pt:"Obrigado! Muito feliz", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]}
+    ]},
+  { afterLevel:17, title:"Check-in no hotel",
+    turns:[
+      {who:"them", cyr:"Добрый день! У вас есть бронь?", tr:"Dóbryy den! U vas yest bron?", pt:"Boa tarde! Tem reserva?"},
+      {who:"me", opts:[{cyr:"Да, на имя Лукас", tr:"Da, na ímya Lukas", pt:"Sim, em nome de Lucas", ok:true},{cyr:"Снег", tr:"Snyek", pt:"Neve", ok:false}]},
+      {who:"them", cyr:"Минуту... Да, нашла. На сколько дней?", tr:"Minútu... Da, nashlá. Na skólka dnyey?", pt:"Um minuto... Sim, achei. Por quantos dias?"},
+      {who:"me", opts:[{cyr:"На десять дней", tr:"Na dyésit dnyey", pt:"Por dez dias", ok:true},{cyr:"Красный", tr:"Krásny", pt:"Vermelho", ok:false}]},
+      {who:"them", cyr:"Отлично. Ваш номер двести пять.", tr:"Atlíchna. Vash nómer dvésti pyat.", pt:"Ótimo. Seu quarto é 205."},
+      {who:"me", opts:[{cyr:"Спасибо. Где лифт?", tr:"Spassíba. Gdye lift?", pt:"Obrigado. Onde é o elevador?", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Лифт направо.", tr:"Lift napráva.", pt:"O elevador é à direita."},
+      {who:"me", opts:[{cyr:"А завтрак во сколько?", tr:"A záftrak va skólka?", pt:"E o café da manhã, a que horas?", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Завтрак с семи до десяти.", tr:"Záftrak s simí da disití.", pt:"Café das sete às dez."},
+      {who:"me", opts:[{cyr:"Отлично. Есть Wi-Fi?", tr:"Atlíchna. Yest vay-fáy?", pt:"Ótimo. Tem Wi-Fi?", ok:true},{cyr:"Мама", tr:"Máma", pt:"Mãe", ok:false}]},
+      {who:"them", cyr:"Да, пароль на столе.", tr:"Da, paról na stalyé.", pt:"Sim, a senha está na mesa."},
+      {who:"me", opts:[{cyr:"Спасибо большое!", tr:"Spassíba balshóye!", pt:"Muito obrigado!", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]},
+      {who:"them", cyr:"Вам нужна помощь с багажом?", tr:"Vam nuzhná pómasch s bagazhóm?", pt:"Precisa de ajuda com a bagagem?"},
+      {who:"me", opts:[{cyr:"Нет, спасибо", tr:"Nyet, spassíba", pt:"Não, obrigado", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Ресторан на первом этаже.", tr:"Ristarán na pyérvam etazhé.", pt:"O restaurante é no térreo."},
+      {who:"me", opts:[{cyr:"Отлично, спасибо", tr:"Atlíchna, spassíba", pt:"Ótimo, obrigado", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Если что-то нужно — звоните.", tr:"Yésli shto-ta núzhna — zvaníte.", pt:"Se precisar de algo, ligue."},
+      {who:"me", opts:[{cyr:"Хорошо, спасибо", tr:"Kharashó, spassíba", pt:"Ok, obrigado", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Хорошего отдыха!", tr:"Kharóshiva óddykha!", pt:"Bom descanso!"},
+      {who:"me", opts:[{cyr:"Спасибо большое!", tr:"Spassíba balshóye!", pt:"Muito obrigado!", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Приятного отдыха!", tr:"Priyátnava óddykha!", pt:"Bom descanso!"},
+      {who:"me", opts:[{cyr:"Спасибо, до свидания!", tr:"Spassíba, da svidániya!", pt:"Obrigado, até logo!", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]}
+    ]},
+  { afterLevel:18, title:"Conversa sobre o tempo",
+    turns:[
+      {who:"them", cyr:"Какая сегодня погода!", tr:"Kakáya sivódnya pagóda!", pt:"Que tempo hoje!"},
+      {who:"me", opts:[{cyr:"Да, сегодня жарко", tr:"Da, sivódnya zhárka", pt:"Sim, hoje está quente", ok:true},{cyr:"Брат", tr:"Brat", pt:"Irmão", ok:false}]},
+      {who:"them", cyr:"Вы любите жару?", tr:"Vy lyúbite zharú?", pt:"Você gosta de calor?"},
+      {who:"me", opts:[{cyr:"Да, я из Бразилии", tr:"Da, ya iz Brazílii", pt:"Sim, sou do Brasil", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"А, тогда вам легко! А зимой холодно.", tr:"A, tagdá vam likhkó! A zimóy khóladna.", pt:"Ah, então é fácil pra você! Mas no inverno é frio."},
+      {who:"me", opts:[{cyr:"Да, я не люблю холод", tr:"Da, ya ni lyublyú khólat", pt:"Sim, eu não gosto de frio", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Здесь бывает снег.", tr:"Zdyes byváit snyek.", pt:"Aqui costuma nevar."},
+      {who:"me", opts:[{cyr:"Снег красивый, но холодно", tr:"Snyek krasívy, no khóladna", pt:"A neve é bonita, mas é frio", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"А что говорят про завтра?", tr:"A shto gavaryát pra záftra?", pt:"E o que dizem sobre amanhã?"},
+      {who:"me", opts:[{cyr:"Завтра будет дождь", tr:"Záftra búdit dozht", pt:"Amanhã vai chover", ok:true},{cyr:"Мама", tr:"Máma", pt:"Mãe", ok:false}]},
+      {who:"them", cyr:"А какая погода у вас дома?", tr:"A kakáya pagóda u vas dóma?", pt:"E como é o tempo lá na sua terra?"},
+      {who:"me", opts:[{cyr:"Дома всегда тепло", tr:"Dóma vsigdá tipló", pt:"Em casa é sempre quente", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Как вам зима в России?", tr:"Kak vam zimá v Rassíi?", pt:"O que acha do inverno na Rússia?"},
+      {who:"me", opts:[{cyr:"Красиво, но холодно", tr:"Krasíva, no khóladna", pt:"Bonito, mas frio", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Вы взяли куртку?", tr:"Vy vzyáli kúrtku?", pt:"Você pegou casaco?"},
+      {who:"me", opts:[{cyr:"Да, на всякий случай", tr:"Da, na vsyáky slúchay", pt:"Sim, por via das dúvidas", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Вечером будет прохладно.", tr:"Vyécheram búdit prakhládna.", pt:"À noite vai esfriar."},
+      {who:"me", opts:[{cyr:"Понятно, спасибо", tr:"Panyátna, spassíba", pt:"Entendi, obrigado", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Берегите себя!", tr:"Biriguíte sibyá!", pt:"Cuide-se!"},
+      {who:"me", opts:[{cyr:"Спасибо, вы тоже", tr:"Spassíba, vy tózhe", pt:"Obrigado, você também", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Жаль! Возьмите зонт.", tr:"Zhal! Vazmíte zont.", pt:"Que pena! Leve um guarda-chuva."},
+      {who:"me", opts:[{cyr:"Хорошая идея, спасибо", tr:"Kharóshaya idéya, spassíba", pt:"Boa ideia, obrigado", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]}
+    ]},
+  { afterLevel:18, title:"Conhecendo a cidade",
+    turns:[
+      {who:"them", cyr:"Вы здесь впервые?", tr:"Vy zdyes fpirvýe?", pt:"É a sua primeira vez aqui?"},
+      {who:"me", opts:[{cyr:"Да, я турист", tr:"Da, ya turíst", pt:"Sim, sou turista", ok:true},{cyr:"Холодно", tr:"Khóladna", pt:"Frio", ok:false}]},
+      {who:"them", cyr:"Откуда вы?", tr:"Atkúda vy?", pt:"De onde você é?"},
+      {who:"me", opts:[{cyr:"Я из Бразилии", tr:"Ya iz Brazílii", pt:"Sou do Brasil", ok:true},{cyr:"Три", tr:"Tri", pt:"Três", ok:false}]},
+      {who:"them", cyr:"Далеко! И как вам город?", tr:"Dalikó! I kak vam górat?", pt:"Longe! E o que achou da cidade?"},
+      {who:"me", opts:[{cyr:"Город очень красивый", tr:"Górat óchin krasívy", pt:"A cidade é muito bonita", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Что вы уже видели?", tr:"Shto vy uzhé vídeli?", pt:"O que você já viu?"},
+      {who:"me", opts:[{cyr:"Метро и центр", tr:"Mitró i tsentr", pt:"O metrô e o centro", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"А еда вам нравится?", tr:"A yidá vam nrávitsa?", pt:"E a comida, você gosta?"},
+      {who:"me", opts:[{cyr:"Да, очень вкусно!", tr:"Da, óchin fkúsna!", pt:"Sim, muito gostosa!", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Как долго вы здесь?", tr:"Kak dólga vy zdyes?", pt:"Quanto tempo você fica aqui?"},
+      {who:"me", opts:[{cyr:"Десять дней", tr:"Dyésit dnyey", pt:"Dez dias", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Советую увидеть центр вечером.", tr:"Savétuyu uvídit tsentr vyécheram.", pt:"Recomendo ver o centro à noite."},
+      {who:"me", opts:[{cyr:"Спасибо за совет!", tr:"Spassíba za savyét!", pt:"Obrigado pela dica!", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Вы путешествуете один?", tr:"Vy putishéstvuite adín?", pt:"Você viaja sozinho?"},
+      {who:"me", opts:[{cyr:"Нет, с семьёй", tr:"Nyet, s simyóy", pt:"Não, com a família", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Хотите совет по ресторанам?", tr:"Khatíte savyét pa ristaránam?", pt:"Quer uma dica de restaurantes?"},
+      {who:"me", opts:[{cyr:"Да, конечно!", tr:"Da, kanyéshna!", pt:"Sim, claro!", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Попробуйте местную кухню.", tr:"Papróbuyte myésnuyu kúkhnyu.", pt:"Experimente a comida local."},
+      {who:"me", opts:[{cyr:"Обязательно попробую", tr:"Abizátilna papróbuyu", pt:"Com certeza vou provar", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Здорово! Хорошего вам отдыха.", tr:"Zdórava! Kharóshiva vam óddykha.", pt:"Legal! Bom descanso pra você."},
+      {who:"me", opts:[{cyr:"Спасибо большое!", tr:"Spassíba balshóye!", pt:"Muito obrigado!", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]}
+    ]},
+  { afterLevel:19, title:"Planos do dia",
+    turns:[
+      {who:"them", cyr:"Что вы хотите делать сегодня?", tr:"Shto vy khatíte dyélat sivódnya?", pt:"O que quer fazer hoje?"},
+      {who:"me", opts:[{cyr:"Сначала хочу есть", tr:"Snachála khachú yest", pt:"Primeiro quero comer", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"А потом?", tr:"A patóm?", pt:"E depois?"},
+      {who:"me", opts:[{cyr:"Потом хочу работать", tr:"Patóm khachú rabótat", pt:"Depois quero trabalhar", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Вы много работаете!", tr:"Vy mnóga rabótaite!", pt:"Você trabalha muito!"},
+      {who:"me", opts:[{cyr:"Да, я люблю свою работу", tr:"Da, ya lyublyú svayú rabótu", pt:"Sim, eu amo meu trabalho", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"А вечером?", tr:"A vyécheram?", pt:"E à noite?"},
+      {who:"me", opts:[{cyr:"Вечером хочу гулять", tr:"Vyécheram khachú gulyát", pt:"À noite quero passear", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Куда пойдёте?", tr:"Kudá paydyóte?", pt:"Aonde vai?"},
+      {who:"me", opts:[{cyr:"В центр, хочу знать город", tr:"V tsentr, khachú znat górat", pt:"Ao centro, quero conhecer a cidade", ok:true},{cyr:"Мама", tr:"Máma", pt:"Mãe", ok:false}]},
+      {who:"them", cyr:"Хотите пойти со мной?", tr:"Khatíte paytí sa mnoy?", pt:"Quer ir comigo?"},
+      {who:"me", opts:[{cyr:"Да, с удовольствием", tr:"Da, s udavólstviyem", pt:"Sim, com prazer", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"А где хотите поесть?", tr:"A gdye khatíte payést?", pt:"E onde você quer comer?"},
+      {who:"me", opts:[{cyr:"В центре", tr:"V tséntre", pt:"No centro", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Потом можем гулять вместе.", tr:"Patóm mózhem gulyát vmésti.", pt:"Depois podemos passear juntos."},
+      {who:"me", opts:[{cyr:"Отличная идея!", tr:"Atlíchnaya idéya!", pt:"Ótima ideia!", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Во сколько встречаемся?", tr:"Va skólka fstricháimsya?", pt:"A que horas nos encontramos?"},
+      {who:"me", opts:[{cyr:"В пять часов", tr:"V pyat chasóf", pt:"Às cinco horas", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Договорились!", tr:"Dagavarílis!", pt:"Combinado!"},
+      {who:"me", opts:[{cyr:"До встречи!", tr:"Da fstryéchi!", pt:"Até logo!", ok:true},{cyr:"Холодно", tr:"Khóladna", pt:"Frio", ok:false}]},
+      {who:"them", cyr:"Отличный план!", tr:"Atlíchny plan!", pt:"Ótimo plano!"},
+      {who:"me", opts:[{cyr:"Спасибо! Хочу говорить по-русски", tr:"Spassíba! Khachú gavarít pa-rúski", pt:"Obrigado! Quero falar russo", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]}
+    ]},
+  { afterLevel:20, title:"Fazendo perguntas",
+    turns:[
+      {who:"them", cyr:"Задайте мне вопросы, потренируйтесь!", tr:"Zadáyte mnye vaprósy, patrinirúytis!", pt:"Me faça perguntas, pratique!"},
+      {who:"me", opts:[{cyr:"Как вас зовут?", tr:"Kak vas zavút?", pt:"Como se chama?", ok:true},{cyr:"Спасибо", tr:"Spassíba", pt:"Obrigado", ok:false}]},
+      {who:"them", cyr:"Меня зовут Иван. Дальше?", tr:"Minyá zavút Iván. Dálshe?", pt:"Meu nome é Ivan. Adiante?"},
+      {who:"me", opts:[{cyr:"Откуда вы?", tr:"Atkúda vy?", pt:"De onde você é?", ok:true},{cyr:"Красный", tr:"Krásny", pt:"Vermelho", ok:false}]},
+      {who:"them", cyr:"Я из Москвы. Ещё?", tr:"Ya iz Maskvý. Yeschó?", pt:"Sou de Moscou. Mais?"},
+      {who:"me", opts:[{cyr:"Кто вы по профессии?", tr:"Kto vy pa prafésii?", pt:"Qual é a sua profissão?", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Я врач. Спрашивайте ещё.", tr:"Ya vrach. Spráshivayte yeschó.", pt:"Sou médico. Pergunte mais."},
+      {who:"me", opts:[{cyr:"Где вы работаете?", tr:"Gdye vy rabótaite?", pt:"Onde você trabalha?", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"В больнице. Хороший вопрос!", tr:"V balnítse. Kharóshy vaprós!", pt:"No hospital. Boa pergunta!"},
+      {who:"me", opts:[{cyr:"Когда вы работаете?", tr:"Kagdá vy rabótaite?", pt:"Quando você trabalha?", ok:true},{cyr:"Мама", tr:"Máma", pt:"Mãe", ok:false}]},
+      {who:"them", cyr:"Задайте ещё один вопрос.", tr:"Zadáyte yeschó adín vaprós.", pt:"Faça mais uma pergunta."},
+      {who:"me", opts:[{cyr:"Почему вы врач?", tr:"Pachimú vy vrach?", pt:"Por que você é médico?", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Отвечаю: люблю людей. Ещё?", tr:"Atvicháyu: lyublyú lyudéy. Yeschó?", pt:"Respondo: gosto de pessoas. Mais?"},
+      {who:"me", opts:[{cyr:"Что вы любите есть?", tr:"Shto vy lyúbite yest?", pt:"O que você gosta de comer?", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Люблю рыбу. Спрашивайте.", tr:"Lyublyú rýbu. Spráshivayte.", pt:"Gosto de peixe. Pergunte."},
+      {who:"me", opts:[{cyr:"Какой ваш любимый цвет?", tr:"Kakóy vash lyubímy tsvet?", pt:"Qual sua cor favorita?", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Синий. Отличные вопросы!", tr:"Síniy. Atlíchnye vaprósy!", pt:"Azul. Ótimas perguntas!"},
+      {who:"me", opts:[{cyr:"Спасибо, я стараюсь", tr:"Spassíba, ya staráyus", pt:"Obrigado, eu me esforço", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Продолжайте учиться!", tr:"Pradalzháyte uchítsa!", pt:"Continue estudando!"},
+      {who:"me", opts:[{cyr:"Обязательно!", tr:"Abizátilna!", pt:"Com certeza!", ok:true},{cyr:"Холодно", tr:"Khóladna", pt:"Frio", ok:false}]},
+      {who:"them", cyr:"Каждый день. Вы отлично спрашиваете!", tr:"Kázhdy den. Vy atlíchna spráshivaite!", pt:"Todo dia. Você pergunta muito bem!"},
+      {who:"me", opts:[{cyr:"Спасибо! Было полезно", tr:"Spassíba! Býla palyézna", pt:"Obrigado! Foi útil", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]}
+    ]},
+  { afterLevel:20, title:"Ao telefone",
+    turns:[
+      {who:"them", cyr:"Алло! Кто это?", tr:"Alló! Kto éta?", pt:"Alô! Quem é?"},
+      {who:"me", opts:[{cyr:"Это Лукас", tr:"Éta Lukas", pt:"É o Lucas", ok:true},{cyr:"Холодно", tr:"Khóladna", pt:"Frio", ok:false}]},
+      {who:"them", cyr:"Привет, Лукас! Как дела?", tr:"Privét, Lukas! Kak diêlá?", pt:"Oi, Lucas! Como vai?"},
+      {who:"me", opts:[{cyr:"Хорошо, а ты?", tr:"Kharashó, a ty?", pt:"Bem, e você?", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Тоже хорошо. Что делаешь?", tr:"Tózhe kharashó. Shto dyélaish?", pt:"Também bem. O que faz?"},
+      {who:"me", opts:[{cyr:"Ничего. Хочешь встретиться?", tr:"Nichivó. Khóchish fstryétitsa?", pt:"Nada. Quer se encontrar?", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Да! Когда?", tr:"Da! Kagdá?", pt:"Sim! Quando?"},
+      {who:"me", opts:[{cyr:"Завтра, в пять", tr:"Záftra, v pyat", pt:"Amanhã, às cinco", ok:true},{cyr:"Мясо", tr:"Myása", pt:"Carne", ok:false}]},
+      {who:"them", cyr:"А где?", tr:"A gdye?", pt:"E onde?"},
+      {who:"me", opts:[{cyr:"У метро, в центре", tr:"U mitró, v tséntre", pt:"No metrô, no centro", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Кто ещё придёт?", tr:"Kto yeschó pridyót?", pt:"Quem mais vai vir?"},
+      {who:"me", opts:[{cyr:"Мой брат", tr:"Moy brat", pt:"Meu irmão", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Что взять с собой?", tr:"Shto vzyat s sabóy?", pt:"O que devo levar?"},
+      {who:"me", opts:[{cyr:"Ничего, только себя", tr:"Nichivó, tólka sibyá", pt:"Nada, só você", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Хорошо. Долго будем?", tr:"Kharashó. Dólga búdim?", pt:"Ok. Vamos ficar muito tempo?"},
+      {who:"me", opts:[{cyr:"Часа два", tr:"Chasá dva", pt:"Umas duas horas", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Отлично, я рад!", tr:"Atlíchna, ya rat!", pt:"Ótimo, estou feliz!"},
+      {who:"me", opts:[{cyr:"Я тоже рад", tr:"Ya tózhe rat", pt:"Eu também estou feliz", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Тогда до завтра!", tr:"Tagdá da záftra!", pt:"Então até amanhã!"},
+      {who:"me", opts:[{cyr:"До завтра!", tr:"Da záftra!", pt:"Até amanhã!", ok:true},{cyr:"Холодно", tr:"Khóladna", pt:"Frio", ok:false}]},
+      {who:"them", cyr:"Отлично! Договорились.", tr:"Atlíchna! Dagavarílis.", pt:"Ótimo! Combinado."},
+      {who:"me", opts:[{cyr:"До завтра, до встречи!", tr:"Da záftra, da fstryéchi!", pt:"Até amanhã, até logo!", ok:true},{cyr:"Помогите", tr:"Pamagíte", pt:"Socorro", ok:false}]}
+    ]},
+  { afterLevel:21, title:"Na farmácia",
+    turns:[
+      {who:"them", cyr:"Здравствуйте! Что случилось?", tr:"Zdrávstvuyte! Shto sluchílas?", pt:"Olá! O que aconteceu?"},
+      {who:"me", opts:[{cyr:"Мне плохо", tr:"Mnye plókha", pt:"Estou passando mal", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Где болит?", tr:"Gdye balít?", pt:"Onde dói?"},
+      {who:"me", opts:[{cyr:"Здесь болит", tr:"Zdyes balít", pt:"Dói aqui", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Давно?", tr:"Davnó?", pt:"Há muito tempo?"},
+      {who:"me", opts:[{cyr:"Со вчера", tr:"Sa vcherá", pt:"Desde ontem", ok:true},{cyr:"Красный", tr:"Krásny", pt:"Vermelho", ok:false}]},
+      {who:"them", cyr:"У вас есть температура?", tr:"U vas yest timpiratúra?", pt:"Você está com febre?"},
+      {who:"me", opts:[{cyr:"Да, немного", tr:"Da, nimnóga", pt:"Sim, um pouco", ok:true},{cyr:"Мама", tr:"Máma", pt:"Mãe", ok:false}]},
+      {who:"them", cyr:"Понятно. Вот лекарство.", tr:"Panyátna. Vot likárstva.", pt:"Entendi. Aqui está o remédio."},
+      {who:"me", opts:[{cyr:"Спасибо. Как принимать?", tr:"Spassíba. Kak prinimát?", pt:"Obrigado. Como tomar?", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Два раза в день.", tr:"Dva ráza v den.", pt:"Duas vezes ao dia."},
+      {who:"me", opts:[{cyr:"Хорошо, спасибо, доктор!", tr:"Kharashó, spassíba, dóktar!", pt:"Ok, obrigado, doutor!", ok:true},{cyr:"Пока", tr:"Paká", pt:"Tchau", ok:false}]},
+      {who:"them", cyr:"Пейте больше воды.", tr:"Péyte bólshe vadý.", pt:"Beba mais água."},
+      {who:"me", opts:[{cyr:"Хорошо, спасибо", tr:"Kharashó, spassíba", pt:"Ok, obrigado", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Отдыхайте больше.", tr:"Addykháyte bólshe.", pt:"Descanse mais."},
+      {who:"me", opts:[{cyr:"Хорошо, постараюсь", tr:"Kharashó, pastaráyus", pt:"Ok, vou tentar", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Если не пройдёт — к врачу.", tr:"Yésli ni praydyót — k vrachú.", pt:"Se não passar, vá ao médico."},
+      {who:"me", opts:[{cyr:"Понял, спасибо", tr:"Pónyal, spassíba", pt:"Entendi, obrigado", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Выздоравливайте скорее!", tr:"Vyzdaravlivayte skaréye!", pt:"Melhoras logo!"},
+      {who:"me", opts:[{cyr:"Спасибо большое!", tr:"Spassíba balshóye!", pt:"Muito obrigado!", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Выздоравливайте!", tr:"Vyzdaravlivayte!", pt:"Melhoras!"},
+      {who:"me", opts:[{cyr:"Спасибо большое!", tr:"Spassíba balshóye!", pt:"Muito obrigado!", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]}
+    ]},
+  { afterLevel:21, title:"Emergência na rua",
+    turns:[
+      {who:"them", cyr:"Вам плохо? Помочь?", tr:"Vam plókha? Pamóch?", pt:"Está passando mal? Ajudo?"},
+      {who:"me", opts:[{cyr:"Помогите, пожалуйста!", tr:"Pamagíte, pazhálusta!", pt:"Ajuda, por favor!", ok:true},{cyr:"Спасибо, хорошо", tr:"Spassíba, kharashó", pt:"Obrigado, tudo bem", ok:false}]},
+      {who:"them", cyr:"Что случилось?", tr:"Shto sluchílas?", pt:"O que aconteceu?"},
+      {who:"me", opts:[{cyr:"Мне очень плохо", tr:"Mnye óchin plókha", pt:"Estou muito mal", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Где болит?", tr:"Gdye balít?", pt:"Onde dói?"},
+      {who:"me", opts:[{cyr:"Болит здесь", tr:"Balít zdyes", pt:"Dói aqui", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Вызвать скорую?", tr:"Výzvat skóruyu?", pt:"Chamo a ambulância?"},
+      {who:"me", opts:[{cyr:"Да, вызовите скорую", tr:"Da, výzavite skóruyu", pt:"Sim, chame a ambulância", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Где ближайшая больница, знаете?", tr:"Gdye blizháyshaya balnítsa, znáite?", pt:"Sabe onde é o hospital mais próximo?"},
+      {who:"me", opts:[{cyr:"Нет, я турист", tr:"Nyet, ya turíst", pt:"Não, sou turista", ok:true},{cyr:"Мама", tr:"Máma", pt:"Mãe", ok:false}]},
+      {who:"them", cyr:"Не волнуйтесь, помощь едет.", tr:"Ni valnúytis, pómasch yédit.", pt:"Não se preocupe, a ajuda vem."},
+      {who:"me", opts:[{cyr:"Спасибо большое!", tr:"Spassíba balshóye!", pt:"Muito obrigado!", ok:true},{cyr:"Пока", tr:"Paká", pt:"Tchau", ok:false}]},
+      {who:"them", cyr:"Вы можете сидеть?", tr:"Vy mózhite sidyét?", pt:"Você consegue sentar?"},
+      {who:"me", opts:[{cyr:"Да, немного", tr:"Da, nimnóga", pt:"Sim, um pouco", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Дышите спокойно.", tr:"Dyshýte spakóyna.", pt:"Respire com calma."},
+      {who:"me", opts:[{cyr:"Хорошо, спасибо", tr:"Kharashó, spassíba", pt:"Ok, obrigado", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Скорая уже близко.", tr:"Skóraya uzhé blízka.", pt:"A ambulância já está perto."},
+      {who:"me", opts:[{cyr:"Слава богу", tr:"Sláva bógu", pt:"Graças a Deus", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Всё будет хорошо, держитесь.", tr:"Vsyo búdit kharashó, dirzhýtis.", pt:"Vai ficar tudo bem, aguente."},
+      {who:"me", opts:[{cyr:"Спасибо вам", tr:"Spassíba vam", pt:"Obrigado a você", ok:true},{cyr:"Холодно", tr:"Khóladna", pt:"Frio", ok:false}]},
+      {who:"them", cyr:"Держитесь, всё будет хорошо.", tr:"Dirzhýtis, vsyo búdit kharashó.", pt:"Aguente, vai ficar tudo bem."},
+      {who:"me", opts:[{cyr:"Спасибо, вы очень добры", tr:"Spassíba, vy óchin dabrý", pt:"Obrigado, você é muito gentil", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]}
+    ]},
+  { afterLevel:22, title:"Falando do seu trabalho",
+    turns:[
+      {who:"them", cyr:"Кто вы по профессии?", tr:"Kto vy pa prafésii?", pt:"Qual é a sua profissão?"},
+      {who:"me", opts:[{cyr:"Я тренер вратарей", tr:"Ya tryéner vrataréy", pt:"Sou treinador de goleiros", ok:true},{cyr:"Вода", tr:"Vadá", pt:"Água", ok:false}]},
+      {who:"them", cyr:"Интересно! Какой это спорт?", tr:"Intiésna! Kakóy éta sport?", pt:"Interessante! Que esporte é esse?"},
+      {who:"me", opts:[{cyr:"Мини-футбол, футзал", tr:"Míni-futból, futzál", pt:"Futsal", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"А давно вы тренер?", tr:"A davnó vy tryéner?", pt:"E há quanto tempo é treinador?"},
+      {who:"me", opts:[{cyr:"Десять лет", tr:"Dyésit lyet", pt:"Dez anos", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Большой опыт! Где работаете?", tr:"Balshóy ópyt! Gdye rabótaite?", pt:"Muita experiência! Onde trabalha?"},
+      {who:"me", opts:[{cyr:"На Ближнем Востоке", tr:"Na Blízhnim Vastóke", pt:"No Oriente Médio", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"А ваша команда хорошая?", tr:"A vásha kamánda kharóshaya?", pt:"E sua equipe é boa?"},
+      {who:"me", opts:[{cyr:"Да, очень хорошая", tr:"Da, óchin kharóshaya", pt:"Sim, muito boa", ok:true},{cyr:"Мама", tr:"Máma", pt:"Mãe", ok:false}]},
+      {who:"them", cyr:"А вам нравится ваша работа?", tr:"A vam nrávitsa vásha rabóta?", pt:"E você gosta do seu trabalho?"},
+      {who:"me", opts:[{cyr:"Да, очень люблю", tr:"Da, óchin lyublyú", pt:"Sim, amo muito", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Тяжело быть тренером?", tr:"Tizhiló byt tryéneram?", pt:"É difícil ser treinador?"},
+      {who:"me", opts:[{cyr:"Иногда, но интересно", tr:"Inagdá, no intiésna", pt:"Às vezes, mas interessante", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Сколько игроков в команде?", tr:"Skólka igrakóf v kamánde?", pt:"Quantos jogadores no time?"},
+      {who:"me", opts:[{cyr:"Пять на площадке", tr:"Pyat na plaschátke", pt:"Cinco em quadra", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"А вратарь важен?", tr:"A vratár vázhen?", pt:"E o goleiro é importante?"},
+      {who:"me", opts:[{cyr:"Очень важен!", tr:"Óchin vázhen!", pt:"Muito importante!", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Успехов вашей команде!", tr:"Uspyékhaf váshey kamánde!", pt:"Sucesso à sua equipe!"},
+      {who:"me", opts:[{cyr:"Спасибо большое!", tr:"Spassíba balshóye!", pt:"Muito obrigado!", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Здорово! Удачи на тренировке!", tr:"Zdórava! Udáchi na triniróvke!", pt:"Legal! Boa sorte no treino!"},
+      {who:"me", opts:[{cyr:"Спасибо! До встречи!", tr:"Spassíba! Da fstryéchi!", pt:"Obrigado! Até a próxima!", ok:true},{cyr:"Почему?", tr:"Pachimú?", pt:"Por quê?", ok:false}]}
+    ]},
+  { afterLevel:22, title:"Convite para o treino",
+    turns:[
+      {who:"them", cyr:"Вы тренер? Можно на тренировку?", tr:"Vy tryéner? Mózhna na triniróvku?", pt:"Você é treinador? Posso ir ao treino?"},
+      {who:"me", opts:[{cyr:"Да, конечно!", tr:"Da, kanyéshna!", pt:"Sim, claro!", ok:true},{cyr:"Холодно", tr:"Khóladna", pt:"Frio", ok:false}]},
+      {who:"them", cyr:"Когда тренировка?", tr:"Kagdá triniróvka?", pt:"Quando é o treino?"},
+      {who:"me", opts:[{cyr:"Завтра, в десять", tr:"Záftra, v dyésit", pt:"Amanhã, às dez", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"А где?", tr:"A gdye?", pt:"E onde?"},
+      {who:"me", opts:[{cyr:"В спортзале, в центре", tr:"V sportzále, v tséntre", pt:"No ginásio, no centro", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Что мне взять?", tr:"Shto mnye vzyat?", pt:"O que devo levar?"},
+      {who:"me", opts:[{cyr:"Форму и воду", tr:"Fórmu i vádu", pt:"Uniforme e água", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Вы тренируете вратарей?", tr:"Vy triníruite vrataréy?", pt:"Você treina goleiros?"},
+      {who:"me", opts:[{cyr:"Да, это моя работа", tr:"Da, éta mayá rabóta", pt:"Sim, é o meu trabalho", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"А можно с другом?", tr:"A mózhna s drúgam?", pt:"Posso levar um amigo?"},
+      {who:"me", opts:[{cyr:"Да, конечно", tr:"Da, kanyéshna", pt:"Sim, claro", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Долго идёт тренировка?", tr:"Dólga idyót triniróvka?", pt:"O treino dura muito?"},
+      {who:"me", opts:[{cyr:"Два часа", tr:"Dva chasá", pt:"Duas horas", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"А это бесплатно?", tr:"A éta bisplátna?", pt:"E é de graça?"},
+      {who:"me", opts:[{cyr:"Да, конечно", tr:"Da, kanyéshna", pt:"Sim, claro", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Спасибо! Я очень рад.", tr:"Spassíba! Ya óchin rat.", pt:"Obrigado! Estou muito feliz."},
+      {who:"me", opts:[{cyr:"Буду ждать тебя", tr:"Búdu zhdat tibyá", pt:"Vou te esperar", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Супер! До завтра, спасибо!", tr:"Súper! Da záftra, spassíba!", pt:"Demais! Até amanhã, obrigado!"},
+      {who:"me", opts:[{cyr:"До завтра, до встречи!", tr:"Da záftra, da fstryéchi!", pt:"Até amanhã, até logo!", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]}
+    ]},
+  { afterLevel:22, title:"Durante o jogo",
+    turns:[
+      {who:"them", cyr:"Какой счёт?", tr:"Kakóy schot?", pt:"Qual o placar?"},
+      {who:"me", opts:[{cyr:"Три-два!", tr:"Tri-dva!", pt:"Três a dois!", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Кто выигрывает?", tr:"Kto vyígryvait?", pt:"Quem está ganhando?"},
+      {who:"me", opts:[{cyr:"Моя команда!", tr:"Mayá kamánda!", pt:"Minha equipe!", ok:true},{cyr:"Вода", tr:"Vadá", pt:"Água", ok:false}]},
+      {who:"them", cyr:"Кто забил гол?", tr:"Kto zabíl gol?", pt:"Quem fez o gol?"},
+      {who:"me", opts:[{cyr:"Мой игрок, номер семь", tr:"Moy igrók, nómer syem", pt:"Meu jogador, número sete", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"А как вратарь?", tr:"A kak vratár?", pt:"E o goleiro?"},
+      {who:"me", opts:[{cyr:"Вратарь играет отлично!", tr:"Vratár igráit atlíchna!", pt:"O goleiro joga muito bem!", ok:true},{cyr:"Мама", tr:"Máma", pt:"Mãe", ok:false}]},
+      {who:"them", cyr:"Сколько минут осталось?", tr:"Skólka minút astálas?", pt:"Quantos minutos faltam?"},
+      {who:"me", opts:[{cyr:"Пять минут", tr:"Pyat minút", pt:"Cinco minutos", ok:true},{cyr:"Красный", tr:"Krásny", pt:"Vermelho", ok:false}]},
+      {who:"them", cyr:"Давай, команда!", tr:"Daváy, kamánda!", pt:"Vamos, time!"},
+      {who:"me", opts:[{cyr:"Гол! Мы выиграли!", tr:"Gol! My výigrali!", pt:"Gol! Ganhamos!", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]},
+      {who:"them", cyr:"Вратарь молодец, да?", tr:"Vratár maladyéts, da?", pt:"O goleiro é fera, né?"},
+      {who:"me", opts:[{cyr:"Да, лучший!", tr:"Da, lúchshy!", pt:"Sim, o melhor!", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"А сколько времени осталось?", tr:"A skólka vryémini astálas?", pt:"Quanto tempo ainda falta?"},
+      {who:"me", opts:[{cyr:"Две минуты", tr:"Dvye minúty", pt:"Dois minutos", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Нервничаете?", tr:"Nyérvnichaite?", pt:"Está nervoso?"},
+      {who:"me", opts:[{cyr:"Немного, но верю в команду", tr:"Nimnóga, no vyéryu v kamándu", pt:"Um pouco, mas confio no time", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Отличная игра, тренер!", tr:"Atlíchnaya igrá, tryéner!", pt:"Ótimo jogo, treinador!"},
+      {who:"me", opts:[{cyr:"Спасибо, ребята молодцы", tr:"Spassíba, ribyáta maladtsý", pt:"Obrigado, a rapaziada foi bem", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Поздравляю, тренер!", tr:"Pazdravlyáyu, tryéner!", pt:"Parabéns, treinador!"},
+      {who:"me", opts:[{cyr:"Спасибо! Молодцы!", tr:"Spassíba! Maladtsý!", pt:"Obrigado! Muito bem!", ok:true},{cyr:"Пока", tr:"Paká", pt:"Tchau", ok:false}]}
+    ]},
+  { afterLevel:23, title:"Despedida entre amigos",
+    turns:[
+      {who:"them", cyr:"Мне пора идти.", tr:"Mnye pará ittí.", pt:"Preciso ir."},
+      {who:"me", opts:[{cyr:"Уже? Так рано!", tr:"Uzhé? Tak rána!", pt:"Já? Tão cedo!", ok:true},{cyr:"Помогите", tr:"Pamagíte", pt:"Socorro", ok:false}]},
+      {who:"them", cyr:"Да, много работы. Было приятно!", tr:"Da, mnóga rabóty. Býla priyátna!", pt:"Sim, muito trabalho. Foi um prazer!"},
+      {who:"me", opts:[{cyr:"Мне тоже очень приятно", tr:"Mnye tózhe óchin priyátna", pt:"Pra mim também, muito prazer", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Мы отлично поговорили.", tr:"My atlíchna pagavaríli.", pt:"Conversamos muito bem."},
+      {who:"me", opts:[{cyr:"Да, спасибо за всё", tr:"Da, spassíba za vsyo", pt:"Sim, obrigado por tudo", ok:true},{cyr:"Пять", tr:"Pyat", pt:"Cinco", ok:false}]},
+      {who:"them", cyr:"Когда снова встретимся?", tr:"Kagdá snóva fstryétimsya?", pt:"Quando nos vemos de novo?"},
+      {who:"me", opts:[{cyr:"Может, завтра?", tr:"Mózhet, záftra?", pt:"Talvez amanhã?", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Отлично! Позвоню тебе.", tr:"Atlíchna! Pazvanyú tibyé.", pt:"Ótimo! Te ligo."},
+      {who:"me", opts:[{cyr:"Хорошо, буду ждать", tr:"Kharashó, búdu zhdat", pt:"Ok, vou esperar", ok:true},{cyr:"Мама", tr:"Máma", pt:"Mãe", ok:false}]},
+      {who:"them", cyr:"Спасибо за отличный вечер.", tr:"Spassíba za atlíchny vyécher.", pt:"Obrigado pela ótima noite."},
+      {who:"me", opts:[{cyr:"Тебе спасибо!", tr:"Tibyé spassíba!", pt:"Obrigado você!", ok:true},{cyr:"Синий", tr:"Síniy", pt:"Azul", ok:false}]},
+      {who:"them", cyr:"Передавай привет семье.", tr:"Piridaváy privyét simyé.", pt:"Mande lembranças à família."},
+      {who:"me", opts:[{cyr:"Обязательно передам", tr:"Abizátilna piridám", pt:"Com certeza vou mandar", ok:true},{cyr:"Рыба", tr:"Rýba", pt:"Peixe", ok:false}]},
+      {who:"them", cyr:"Береги себя!", tr:"Biriguí sibyá!", pt:"Cuide-se!"},
+      {who:"me", opts:[{cyr:"Ты тоже береги себя", tr:"Ty tózhe biriguí sibyá", pt:"Você também se cuide", ok:true},{cyr:"Дорого", tr:"Dóraga", pt:"Caro", ok:false}]},
+      {who:"them", cyr:"Было здорово увидеться!", tr:"Býla zdórava uvídetsa!", pt:"Foi ótimo te ver!"},
+      {who:"me", opts:[{cyr:"Полностью согласен!", tr:"Pólnastyu saglásin!", pt:"Concordo totalmente!", ok:true},{cyr:"Холодно", tr:"Khóladna", pt:"Frio", ok:false}]},
+      {who:"them", cyr:"Пока! Удачи и всё хорошо!", tr:"Paká! Udáchi i vsyo kharashó!", pt:"Tchau! Boa sorte e tudo de bom!"},
+      {who:"me", opts:[{cyr:"Пока! Спасибо, до встречи!", tr:"Paká! Spassíba, da fstryéchi!", pt:"Tchau! Obrigado, até logo!", ok:true},{cyr:"Нет", tr:"Nyet", pt:"Não", ok:false}]}
+    ]}
+];
+
+/* ============================================================
+   ESTADO / PERSISTÊNCIA
+   ============================================================ */
+const KEY="russo_do_zero_v2";
+let state = load();
+function load(){
+  try{ const s=JSON.parse(localStorage.getItem(KEY)); if(s) return s; }catch(e){}
+  return {xp:0, streak:1, lastDay:todayStr(), completed:{}, convDone:{}};
+}
+function save(){ try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){} saveCloud(); }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+(function updateStreak(){
+  const t=todayStr();
+  if(state.lastDay!==t){
+    const diff=(new Date(t)-new Date(state.lastDay))/86400000;
+    state.streak = diff===1 ? (state.streak+1) : 1;
+    state.lastDay=t; save();
+  }
+})();
+
+/* ============================================================
+   ÁUDIO — Web Speech API (russo nativo)
+   ============================================================ */
+let ruVoice=null;
+function pickVoice(){
+  const vs=speechSynthesis.getVoices();
+  ruVoice = vs.find(v=>/ru[-_]RU/i.test(v.lang)) || vs.find(v=>/^ru/i.test(v.lang)) || null;
+}
+if('speechSynthesis' in window){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
+function speak(text, el){
+  if(!('speechSynthesis' in window)){ toast("Áudio não suportado neste navegador","bad"); return; }
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(String(text).replace(/…/g,''));
+  u.lang="ru-RU"; u.rate=.85; u.pitch=1;
+  if(ruVoice) u.voice=ruVoice;
+  if(el){ el.classList.add('playing'); u.onend=()=>el.classList.remove('playing'); u.onerror=()=>el.classList.remove('playing'); }
+  speechSynthesis.speak(u);
+}
+
+/* ===== Diagnóstico de áudio ===== */
+function runAudioTest(){
+  const box=document.getElementById('audioResult');
+  box.style.display='block';
+  if(!('speechSynthesis' in window)){
+    box.innerHTML='❌ <b>Seu navegador não suporta síntese de voz.</b><br>Abra o app no <b>Chrome</b> ou <b>Edge</b>.';
+    return;
+  }
+  pickVoice();
+  const vs=speechSynthesis.getVoices();
+  const ru=vs.filter(v=>/^ru/i.test(v.lang));
+  const isSafari=/^((?!chrome|android|crios|edg).)*safari/i.test(navigator.userAgent);
+  let html='🔎 Vozes disponíveis no total: <b>'+vs.length+'</b><br>';
+  if(vs.length===0){
+    html+='⚠️ O navegador ainda não carregou as vozes. Clique de novo em <b>"Testar áudio"</b> em 1-2 segundos.<br>';
+  }
+  if(ru.length>0){
+    html+='✅ Voz em russo encontrada: <b>'+ru.map(v=>v.name).join(', ')+'</b><br>';
+    html+='▶️ Tocando teste... você deve ouvir <b>"Привет"</b> (Privét = Oi).';
+    const u=new SpeechSynthesisUtterance('Привет! Это тест.');
+    u.lang='ru-RU'; u.rate=.85; u.voice=ru[0];
+    u.onend=()=>{ box.innerHTML+='<br>🔊 Áudio terminou. <b>Ouviu?</b> Se sim, está tudo certo — use os botões 🔊 normalmente.'; };
+    u.onerror=(e)=>{ box.innerHTML+='<br>❌ Erro ao tocar: '+(e.error||'desconhecido'); };
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  } else {
+    html+='❌ <b>Nenhuma voz em russo instalada no seu sistema.</b> É por isso que o áudio não sai.<br><br>';
+    html+='<b>🍎 macOS:</b> Ajustes do Sistema → Acessibilidade → <b>Conteúdo Falado</b> → Vozes do sistema → baixe uma voz <b>Русский / Russo</b> (ex.: Milena, Yuri). Depois <b>feche e reabra o navegador</b>.<br><br>';
+    html+='<b>🪟 Windows:</b> Configurações → Hora e Idioma → Idioma e Região → adicionar <b>Русский</b> com o pacote de fala.<br><br>';
+    if(isSafari) html+='💡 Você parece estar no <b>Safari</b>. Tente abrir o arquivo no <b>Chrome</b> — costuma funcionar melhor.<br><br>';
+    html+='▶️ Vou tentar tocar mesmo assim (pode sair mudo ou errado):';
+    const u=new SpeechSynthesisUtterance('Привет');
+    u.lang='ru-RU'; speechSynthesis.cancel(); speechSynthesis.speak(u);
+  }
+  html+='<br><br><small style="color:var(--muted)">Navegador detectado: '+(isSafari?'Safari':(/edg/i.test(navigator.userAgent)?'Edge':(/chrome|crios/i.test(navigator.userAgent)?'Chrome':'outro')))+'</small>';
+  box.innerHTML=html;
+}
+
+/* ============================================================
+   RENDER — mapa por unidades
+   ============================================================ */
+function isUnlocked(id){ return id===0 || state.completed[id-1]; }
+function countDone(){ return LEVELS.filter(l=>state.completed[l.id]).length; }
+function renderMap(){
+  document.getElementById('stXP').textContent=state.xp;
+  document.getElementById('stStreak').textContent=state.streak;
+  const cur=LEVELS.findIndex(l=>!state.completed[l.id]);
+  document.getElementById('stLevel').textContent=(cur<0?LEVELS.length:cur+1);
+  const done=countDone();
+  document.getElementById('ovTxt').textContent=done+" / "+LEVELS.length+" níveis";
+  document.getElementById('ovBar').style.width=(done/LEVELS.length*100)+"%";
+
+  const map=document.getElementById('levelMap'); map.innerHTML='';
+  UNITS.forEach(u=>{
+    const h=document.createElement('h2'); h.className='section'; h.textContent='Unidade '+u.id+' · '+u.name;
+    map.appendChild(h);
+    const sub=document.createElement('p'); sub.className='unit-sub'; sub.textContent=u.sub;
+    map.appendChild(sub);
+    const grid=document.createElement('div'); grid.className='levels';
+    LEVELS.filter(l=>l.unit===u.id).forEach(l=>{
+      const unlocked=isUnlocked(l.id), fin=state.completed[l.id];
+      const d=document.createElement('div');
+      d.className='lvl'+(unlocked?'':' locked');
+      d.innerHTML=`
+        ${fin?'<div class="done">✓ feito</div>':(unlocked?'':'<div class="lock">🔒</div>')}
+        <div class="num">NÍVEL ${l.id+1} · ${l.emoji}</div>
+        <div class="t">${l.title}</div>
+        <div class="ru">${l.ru}</div>
+        <div class="bar"><i style="width:${fin?100:0}%"></i></div>
+        <div class="meta"><span>${l.words.length} itens</span><span>${fin?'concluído':(unlocked?'começar →':'bloqueado')}</span></div>`;
+      if(unlocked) d.onclick=()=>openLesson(l.id);
+      grid.appendChild(d);
+    });
+    map.appendChild(grid);
+  });
+
+  // seção de conversação
+  const h=document.createElement('h2'); h.className='section'; h.textContent='💬 Praticar conversação';
+  map.appendChild(h);
+  const sub=document.createElement('p'); sub.className='unit-sub'; sub.textContent='Diálogos reais que se abrem conforme você avança.';
+  map.appendChild(sub);
+  const grid=document.createElement('div'); grid.className='levels';
+  DIALOGS.forEach((dg,i)=>{
+    const unlocked=state.completed[dg.afterLevel];
+    const d=document.createElement('div'); d.className='lvl'+(unlocked?'':' locked');
+    d.innerHTML=`${unlocked?(state.convDone[i]?'<div class="done">✓ feito</div>':''):'<div class="lock">🔒</div>'}
+      <div class="num">DIÁLOGO ${i+1} · 💬</div>
+      <div class="t">${dg.title}</div>
+      <div class="ru">Диалог</div>
+      <div class="meta"><span>${dg.turns.filter(t=>t.who==='me').length} respostas</span><span>${unlocked?'praticar →':'conclua o nível '+(dg.afterLevel+1)}</span></div>`;
+    if(unlocked) d.onclick=()=>openConv(i);
+    grid.appendChild(d);
+  });
+  map.appendChild(grid);
+  renderReadingSection(map);
+}
+
+/* ============================================================
+   LIÇÃO
+   ============================================================ */
+let curLevel=null, curTab='learn';
+function openLesson(id){
+  curLevel=LEVELS[id];
+  document.getElementById('lTitle').textContent=`Nível ${id+1}: ${curLevel.title}`;
+  document.getElementById('lRu').textContent=curLevel.ru+" · "+curLevel.emoji;
+  document.getElementById('anchorTip').innerHTML='⚓ '+curLevel.intro;
+  const nt=document.getElementById('noteTip');
+  if(curLevel.note){ nt.style.display='block'; nt.innerHTML='📝 '+curLevel.note; }
+  else nt.style.display='none';
+  switchTab('learn'); buildLearn();
+  document.getElementById('lessonScreen').classList.add('open');
+  window.scrollTo(0,0);
+}
+function closeLesson(){ speechSynthesis.cancel(); document.getElementById('lessonScreen').classList.remove('open'); renderMap(); }
+function switchTab(t){
+  curTab=t;
+  document.querySelectorAll('#lessonScreen .tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===t));
+  document.querySelectorAll('#lessonScreen .panel').forEach(x=>x.classList.remove('active'));
+  document.getElementById('panel-'+t).classList.add('active');
+  if(t==='learn') buildLearn();
+  if(t==='listen') buildListen();
+  if(t==='speak') buildSpeak();
+  if(t==='review') buildReview();
+}
+function buildLearn(){
+  const p=document.getElementById('panel-learn'); p.innerHTML='';
+  curLevel.words.forEach(w=>{
+    const c=document.createElement('div'); c.className='wcard';
+    c.innerHTML=`<div class="emoji">${w.e}</div>
+      <div class="body">
+        <div class="cyr">${w.cyr}</div>
+        <div class="tr">[${w.tr}]</div>
+        <div class="pt">${w.pt}</div>
+        <div class="mn">💡 ${w.mn}</div>
+      </div>
+      <div class="speak" title="Ouvir">🔊</div>`;
+    const btn=c.querySelector('.speak'); btn.onclick=()=>speak(w.cyr,btn);
+    p.appendChild(c);
+  });
+  if(curLevel.examples && curLevel.examples.length){
+    const h=document.createElement('div');
+    h.style.cssText='margin:20px 6px 10px;font-weight:800;font-size:15px;color:#c8d0ff';
+    h.textContent='📚 Frases para praticar';
+    p.appendChild(h);
+    curLevel.examples.forEach(exi=>{
+      const c=document.createElement('div'); c.className='wcard';
+      c.innerHTML='<div class="body"><div class="cyr" style="font-size:21px">'+exi.cyr+'</div><div class="tr">['+exi.tr+']</div><div class="pt">'+exi.pt+'</div></div><div class="speak" title="Ouvir">🔊</div>';
+      const b=c.querySelector('.speak'); b.onclick=()=>speak(exi.cyr,b);
+      p.appendChild(c);
+    });
+  }
+  const done=document.createElement('button');
+  done.className='btn primary wide'; done.textContent='Ouvi tudo em voz alta ✓  (+10 XP)';
+  done.onclick=()=>{ addXP(10); toast("Boa! Repetir em voz alta ativa os canais auditivo e motor 🗣️","good"); switchTab('listen'); };
+  p.appendChild(done);
+}
+let listenQ=0, listenScore=0;
+function buildListen(){ listenQ=0; listenScore=0; renderListenQ(); }
+function renderListenQ(){
+  const p=document.getElementById('panel-listen'); const words=curLevel.words;
+  if(listenQ>=words.length){
+    p.innerHTML=`<div class="quizbox"><div class="big" style="font-size:50px">👂</div>
+      <h3>Escuta concluída!</h3><p class="sub">Acertos: ${listenScore}/${words.length}</p>
+      <button class="btn good wide" onclick="switchTab('speak')">Agora praticar a fala 🎤</button></div>`;
+    if(listenScore>=Math.ceil(words.length*0.6)) addXP(15);
+    return;
+  }
+  const correct=words[listenQ];
+  const opts=shuffle([correct, ...shuffle(words.filter(w=>w!==correct)).slice(0,3)]);
+  p.innerHTML=`
+    <div class="progressline"><i style="width:${(listenQ/words.length)*100}%"></i></div>
+    <div class="quizbox">
+      <p class="sub">🎧 Ouça e escolha o que você <b>ouviu</b> (a resposta fica oculta até você tentar)</p>
+      <button class="speak playing" style="margin:6px auto 10px;width:80px;height:80px;font-size:34px" id="bigPlay">🔊</button>
+      <div class="prompt" id="listenReveal" style="font-size:18px;min-height:26px;color:var(--muted)">Toque no 🔊 para ouvir de novo</div>
+      <div class="opts" id="lopts"></div>
+    </div>`;
+  const bp=document.getElementById('bigPlay'); bp.classList.remove('playing'); bp.onclick=()=>speak(correct.cyr,bp); speak(correct.cyr,bp);
+  const box=document.getElementById('lopts');
+  const reveal=document.getElementById('listenReveal');
+  opts.forEach(o=>{
+    const b=document.createElement('div'); b.className='opt';
+    b.innerHTML='<span style="color:var(--ru);font-size:20px;font-weight:800">'+o.cyr+'</span>';
+    b.dataset.cyr=o.cyr;
+    b.onclick=()=>{
+      if(o===correct){ b.classList.add('correct'); listenScore++; toast("Correto! ✅","good"); anchorSuccess(); }
+      else{ b.classList.add('wrong'); toast("A certa era: "+correct.cyr,"bad");
+        [...box.children].forEach(x=>{ if(x.dataset.cyr===correct.cyr) x.classList.add('correct'); }); }
+      reveal.innerHTML='<span style="color:var(--ru);font-weight:800">'+correct.cyr+'</span> <span style="color:var(--muted);font-style:italic">['+correct.tr+']</span> — '+correct.pt;
+      box.querySelectorAll('.opt').forEach(x=>x.onclick=null);
+      setTimeout(()=>{listenQ++;renderListenQ();},1400);
+    };
+    box.appendChild(b);
+  });
+}
+let spQ=0;
+function buildSpeak(){ spQ=0; renderSpeakQ(); }
+function renderSpeakQ(){
+  const p=document.getElementById('panel-speak'); const words=curLevel.words;
+  if(spQ>=words.length){
+    p.innerHTML=`<div class="quizbox"><div class="big" style="font-size:50px">🎉</div>
+      <h3>Você praticou a fala!</h3><p class="sub">Falar em voz alta cria memória muscular. Excelente.</p>
+      <button class="btn good wide" onclick="finishLesson()">Concluir nível ✓ (+25 XP)</button></div>`;
+    return;
+  }
+  const w=words[spQ];
+  const hasRec = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+  p.innerHTML=`
+    <div class="progressline"><i style="width:${(spQ/words.length)*100}%"></i></div>
+    <div class="quizbox">
+      <p class="sub">Ouça, depois repita em voz alta</p>
+      <div class="prompt">${w.cyr}</div>
+      <div class="tr" style="color:var(--muted);font-style:italic;margin-bottom:6px">[${w.tr}] — ${w.pt}</div>
+      <button class="speak" style="margin:4px auto 6px;width:60px;height:60px" id="spPlay">🔊</button>
+      <div><button class="mic" id="micBtn">🎤</button></div>
+      <div class="heard" id="heard">${hasRec?'Toque no microfone e fale':'⚠️ Reconhecimento de voz indisponível — apenas repita em voz alta e avance'}</div>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <button class="btn ghost" style="flex:1" onclick="spSkip()">Repeti em voz alta ✓</button>
+        <button class="btn primary" style="flex:1" onclick="spNext()">Próxima →</button>
+      </div>
+    </div>`;
+  const sp=document.getElementById('spPlay'); sp.onclick=()=>speak(w.cyr,sp); speak(w.cyr,sp);
+  const mic=document.getElementById('micBtn');
+  if(hasRec){ mic.onclick=()=>doRecognition(w); }
+  else { mic.style.opacity=.4; mic.onclick=()=>toast("Use Chrome/Edge para reconhecimento de voz","bad"); }
+}
+function doRecognition(w){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){ toast("Use Chrome ou Edge para o microfone","bad"); return; }
+  speechSynthesis.cancel(); // silencia o TTS para não atrapalhar o mic
+  const rec=new SR(); rec.lang='ru-RU'; rec.interimResults=true; rec.continuous=false; rec.maxAlternatives=3;
+  const mic=document.getElementById('micBtn'), heard=document.getElementById('heard');
+  let got=false;
+  mic.classList.add('rec'); heard.innerHTML='🔴 <b>Ouvindo...</b> fale agora';
+  try{ rec.start(); }catch(e){ mic.classList.remove('rec'); heard.textContent='Já estava ouvindo — toque de novo'; return; }
+  rec.onresult=(ev)=>{
+    let interim='', finalTxt='';
+    for(const r of ev.results){ if(r.isFinal) finalTxt+=r[0].transcript; else interim+=r[0].transcript; }
+    const shown=(finalTxt||interim).trim();
+    if(shown){ got=true; heard.innerHTML='Você disse: <b style="color:var(--warn)">'+shown+'</b>'; }
+    const last=ev.results[ev.results.length-1];
+    if(last.isFinal){
+      const alts=[...last].map(r=>r.transcript.toLowerCase().trim());
+      const target=w.cyr.replace(/…/g,'').toLowerCase().trim();
+      const hit=alts.some(s=>similar(s,target));
+      heard.innerHTML='Você disse: <b style="color:'+(hit?'var(--good)':'var(--warn)')+'">'+alts[0]+'</b>';
+      if(hit){ toast("Pronúncia reconhecida! 🌟","good"); anchorSuccess(); addXP(5); }
+      else{ toast("Quase! Ouça de novo e imite o som","bad"); }
+    }
+  };
+  rec.onerror=(e)=>{
+    mic.classList.remove('rec');
+    const map={
+      'not-allowed':'⚠️ Microfone bloqueado. Cadeado da barra de endereço → Microfone → Permitir, e recarregue.',
+      'service-not-allowed':'⚠️ Microfone bloqueado pelo sistema. Verifique as permissões do navegador.',
+      'no-speech':'Não ouvi nada. Fale mais alto e mais perto do microfone.',
+      'audio-capture':'Nenhum microfone encontrado. Verifique o mic conectado/selecionado.',
+      'network':'Sem internet. O reconhecimento do Chrome precisa de conexão.',
+      'aborted':'Gravação interrompida. Toque de novo.'
+    };
+    heard.textContent=map[e.error]||('Erro: '+e.error);
+    if((e.error==='not-allowed'||e.error==='service-not-allowed') && location.protocol==='file:')
+      heard.innerHTML+='<br><small>Você abriu como arquivo — o Chrome bloqueia mic em file://. Use o atalho "Abrir Russo do Zero.command".</small>';
+  };
+  rec.onend=()=>{ mic.classList.remove('rec'); if(!got && !heard.innerHTML.includes('disse')) heard.textContent='Não captei sua voz — tente o botão "Testar microfone" na tela inicial.'; };
+}
+
+/* ===== Diagnóstico de microfone ===== */
+async function testMic(){
+  const box=document.getElementById('audioResult'); box.style.display='block';
+  box.innerHTML='🎤 Pedindo acesso ao microfone...';
+  if(location.protocol==='file:'){
+    box.innerHTML='⚠️ <b>Você abriu o app como arquivo (file://).</b> O Chrome bloqueia o microfone assim.<br><br>Abra pelo atalho <b>"Abrir Russo do Zero.command"</b> (na sua pasta), que roda em <b>http://localhost</b> — aí o microfone funciona e a permissão fica salva.';
+    return;
+  }
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+    box.innerHTML='❌ Este navegador não permite acesso ao microfone. Use <b>Chrome</b> ou <b>Edge</b>.';
+    return;
+  }
+  let stream;
+  try{ stream=await navigator.mediaDevices.getUserMedia({audio:true}); }
+  catch(e){
+    box.innerHTML='❌ <b>Acesso ao microfone negado</b> ('+(e.name||e)+').<br>Clique no cadeado da barra de endereço → <b>Microfone</b> → <b>Permitir</b>, e recarregue a página.';
+    return;
+  }
+  box.innerHTML='✅ <b>Microfone liberado!</b> Fale algo — a barra deve se mexer:'
+    +'<div style="height:16px;background:#0c0f28;border-radius:8px;overflow:hidden;margin:10px 0"><div id="micBar" style="height:100%;width:0;background:linear-gradient(90deg,var(--good),var(--accent));transition:.05s"></div></div>'
+    +'<div id="micLvl" style="color:var(--muted)">Testando por 6 segundos...</div>';
+  const ctx=new (window.AudioContext||window.webkitAudioContext)();
+  const src=ctx.createMediaStreamSource(stream);
+  const an=ctx.createAnalyser(); an.fftSize=512; src.connect(an);
+  const data=new Uint8Array(an.frequencyBinCount);
+  let peak=0, t0=Date.now();
+  (function loop(){
+    const bar=document.getElementById('micBar'); if(!bar){ stream.getTracks().forEach(t=>t.stop()); ctx.close(); return; }
+    an.getByteFrequencyData(data);
+    let sum=0; for(const v of data) sum+=v; const avg=sum/data.length;
+    bar.style.width=Math.min(100,avg*2.5)+'%'; peak=Math.max(peak,avg);
+    if(Date.now()-t0<6000){ requestAnimationFrame(loop); }
+    else{
+      stream.getTracks().forEach(t=>t.stop()); ctx.close();
+      const lvl=document.getElementById('micLvl');
+      lvl.innerHTML = peak>8
+        ? '✅ Perfeito, o microfone está captando sua voz! Agora use o 🎤 nas lições (aba "Falar").'
+        : '⚠️ Detectei quase nenhum som. Verifique se o microfone certo está selecionado no sistema e fale mais perto.';
+    }
+  })();
+}
+function spSkip(){ toast("Repetir em voz alta já fortalece a memória 💪","good"); spNext(); }
+function spNext(){ spQ++; renderSpeakQ(); }
+let revIdx=0, revCards=[];
+function buildReview(){ revCards=shuffle([...curLevel.words]); revIdx=0; renderRev(); }
+function renderRev(){
+  const p=document.getElementById('panel-review');
+  if(revIdx>=revCards.length){
+    p.innerHTML=`<div class="quizbox"><div class="big" style="font-size:50px">🧩</div>
+      <h3>Revisão completa!</h3><p class="sub">A repetição espaçada move o vocabulário para a memória de longo prazo.</p>
+      <button class="btn primary wide" onclick="buildReview()">Revisar de novo 🔁</button></div>`;
+    return;
+  }
+  const w=revCards[revIdx];
+  p.innerHTML=`
+    <div class="progressline"><i style="width:${(revIdx/revCards.length)*100}%"></i></div>
+    <div class="quizbox" id="flip" style="cursor:pointer;min-height:180px">
+      <p class="sub">O que significa? (toque para virar)</p>
+      <div class="prompt">${w.cyr}</div>
+      <button class="speak" style="margin:8px auto" id="revPlay">🔊</button>
+      <div id="answer" style="display:none">
+        <div class="tr" style="font-style:italic;color:var(--muted)">[${w.tr}]</div>
+        <div style="font-size:20px;font-weight:800;margin-top:4px">${w.pt}</div>
+        <div class="mn" style="text-align:left;margin-top:10px">💡 ${w.mn}</div>
+      </div>
+    </div>
+    <div id="revBtns" style="display:none;gap:10px;margin-top:12px">
+      <button class="btn ghost" style="flex:1" onclick="revGrade(false)">Errei / difícil</button>
+      <button class="btn good" style="flex:1" onclick="revGrade(true)">Acertei fácil ✓</button>
+    </div>`;
+  const rp=document.getElementById('revPlay'); rp.onclick=(e)=>{e.stopPropagation();speak(w.cyr,rp);};
+  document.getElementById('flip').onclick=()=>{
+    document.getElementById('answer').style.display='block';
+    document.getElementById('revBtns').style.display='flex';
+  };
+}
+function revGrade(ok){ if(ok){ addXP(3); anchorSuccess(); } revIdx++; renderRev(); }
+function finishLesson(){
+  const id=curLevel.id; const first=!state.completed[id];
+  state.completed[id]=true; addXP(25); save();
+  const p=document.getElementById('panel-speak');
+  p.innerHTML=`<div class="complete">
+    <div class="big">🏆</div>
+    <h3>Nível ${id+1} concluído!</h3>
+    <p style="color:var(--muted)">${first?'Novo nível desbloqueado. Seu cérebro acabou de criar novas conexões.':'Revisão reforçada — cada repetição fortalece a trilha neural.'}</p>
+    <p class="mn" style="display:inline-block;text-align:left;margin:14px auto">🧠 PNL: feche os olhos por 3 segundos e reviva a sensação de ter conseguido. Você está ancorando o sucesso.</p>
+    <div style="margin-top:16px"><button class="btn primary" onclick="closeLesson()">Voltar à trilha →</button></div>
+  </div>`;
+  renderMap();
+}
+
+/* ============================================================
+   CONVERSAÇÃO
+   ============================================================ */
+let curDialog=null, curDialogIdx=null, dTurn=0;
+function openConv(i){
+  curDialog=DIALOGS[i]; curDialogIdx=i; dTurn=0;
+  document.getElementById('cTitle').textContent=curDialog.title;
+  document.getElementById('chatBox').innerHTML='';
+  document.getElementById('replyBox').innerHTML='';
+  document.getElementById('convScreen').classList.add('open');
+  window.scrollTo(0,0); nextTurn();
+}
+function closeConv(){ speechSynthesis.cancel(); document.getElementById('convScreen').classList.remove('open'); renderMap(); }
+function addMsg(who,cyr,tr,pt){
+  const box=document.getElementById('chatBox');
+  const m=document.createElement('div'); m.className='msg '+who;
+  m.innerHTML=`<div class="cyr">${cyr} <span style="cursor:pointer">🔊</span></div><div class="tr">[${tr}]</div><div class="pt">${pt}</div>`;
+  m.querySelector('span').onclick=()=>speak(cyr);
+  box.appendChild(m); window.scrollTo(0,document.body.scrollHeight);
+}
+function nextTurn(){
+  const rb=document.getElementById('replyBox'); rb.innerHTML='';
+  if(dTurn>=curDialog.turns.length){
+    if(!state.convDone[curDialogIdx]){ state.convDone[curDialogIdx]=true; addXP(20); save(); }
+    const done=document.createElement('div'); done.className='quizbox';
+    done.innerHTML=`<div class="big" style="font-size:44px">💬🎉</div><h3>Diálogo completo!</h3>
+      <p class="sub">Você conversou em russo. Isso é fluência em construção.</p>
+      <button class="btn primary wide" onclick="closeConv()">Voltar →</button>`;
+    rb.appendChild(done); return;
+  }
+  const turn=curDialog.turns[dTurn];
+  if(turn.who==='them'){
+    addMsg('them',turn.cyr,turn.tr,turn.pt);
+    setTimeout(()=>speak(turn.cyr),400);
+    dTurn++; setTimeout(nextTurn,900);
+  } else {
+    turn.opts.forEach(o=>{
+      const b=document.createElement('button'); b.className='btn ghost wide'; b.style.textAlign='left';
+      b.innerHTML=`<b style="color:var(--ru)">${o.cyr}</b> <span style="color:var(--muted);font-size:12px">[${o.tr}] — ${o.pt}</span>`;
+      b.onclick=()=>{
+        if(o.ok){
+          addMsg('me',o.cyr,o.tr,o.pt); speak(o.cyr);
+          toast("Boa resposta! 👏","good"); anchorSuccess();
+          dTurn++; setTimeout(nextTurn,700);
+        } else { toast("Essa não encaixa aqui — tente a outra","bad"); b.style.borderColor='var(--bad)'; }
+      };
+      rb.appendChild(b);
+    });
+  }
+}
+
+/* ============================================================
+   LEITURA — textos progressivos (leitor graduado)
+   ============================================================ */
+const READTEXTS = [{"afterLevel": 5, "title": "Quem sou eu", "ru": "Кто я", "emoji": "🙋", "sentences": [{"cyr": "Привет! Меня зовут Лукас.", "tr": "Privét! Minyá zavút Lukas.", "pt": "Oi! Meu nome é Lucas."}, {"cyr": "Я из Бразилии.", "tr": "Ya iz Brazílii.", "pt": "Sou do Brasil."}, {"cyr": "Очень приятно!", "tr": "Óchin priyátna!", "pt": "Muito prazer!"}, {"cyr": "Я тренер.", "tr": "Ya tryéner.", "pt": "Sou treinador."}, {"cyr": "Я немного говорю по-русски.", "tr": "Ya nimnóga gavaryú pa-rúski.", "pt": "Falo um pouco de russo."}, {"cyr": "До свидания!", "tr": "Da svidániya!", "pt": "Até logo!"}]}, {"afterLevel": 10, "title": "Minha família", "ru": "Моя семья", "emoji": "👨‍👩‍👧", "sentences": [{"cyr": "Это моя семья.", "tr": "Éta mayá simyá.", "pt": "Esta é minha família."}, {"cyr": "У меня есть жена.", "tr": "U minyá yest zhiná.", "pt": "Tenho uma esposa."}, {"cyr": "У меня есть сын и дочь.", "tr": "U minyá yest syn i doch.", "pt": "Tenho um filho e uma filha."}, {"cyr": "Мой сын ещё маленький.", "tr": "Moy syn yeschó málinky.", "pt": "Meu filho ainda é pequeno."}, {"cyr": "Мама и папа в Бразилии.", "tr": "Máma i pápa v Brazílii.", "pt": "Mãe e pai estão no Brasil."}, {"cyr": "Я очень люблю мою семью.", "tr": "Ya óchin lyublyú mayú simyú.", "pt": "Amo muito minha família."}]}, {"afterLevel": 11, "title": "As cores ao meu redor", "ru": "Цвета вокруг меня", "emoji": "🎨", "sentences": [{"cyr": "Я вижу много цветов.", "tr": "Ya vízhu mnóga tsvitóf.", "pt": "Vejo muitas cores."}, {"cyr": "Небо синее.", "tr": "Nyéba síneye.", "pt": "O céu é azul."}, {"cyr": "Трава зелёная.", "tr": "Travá zilyónaya.", "pt": "A grama é verde."}, {"cyr": "Мой мяч красный и белый.", "tr": "Moy myach krásny i bély.", "pt": "Minha bola é vermelha e branca."}, {"cyr": "Ночью всё чёрное.", "tr": "Nóchyu vsyo chórnaye.", "pt": "À noite tudo fica preto."}, {"cyr": "Какой твой любимый цвет?", "tr": "Kakóy tvoy lyubímy tsvet?", "pt": "Qual é a sua cor favorita?"}]}, {"afterLevel": 12, "title": "O meu dia", "ru": "Мой день", "emoji": "⏰", "sentences": [{"cyr": "Сегодня понедельник.", "tr": "Sivódnya panidyélnik.", "pt": "Hoje é segunda-feira."}, {"cyr": "Утром я работаю.", "tr": "Útram ya rabótayu.", "pt": "De manhã eu trabalho."}, {"cyr": "В час дня я ем.", "tr": "V chas dnya ya yem.", "pt": "À uma da tarde eu como."}, {"cyr": "Потом у меня тренировка.", "tr": "Patóm u minyá triniróvka.", "pt": "Depois tenho treino."}, {"cyr": "Вечером я дома.", "tr": "Vyécheram ya dóma.", "pt": "À noite fico em casa."}, {"cyr": "Завтра будет вторник.", "tr": "Záftra búdit ftórnik.", "pt": "Amanhã será terça."}]}, {"afterLevel": 14, "title": "No café", "ru": "В кафе", "emoji": "☕", "sentences": [{"cyr": "Я иду в кафе.", "tr": "Ya idú v kafé.", "pt": "Vou ao café."}, {"cyr": "Здравствуйте!", "tr": "Zdrávstvuyte!", "pt": "Olá!"}, {"cyr": "Я хочу кофе и хлеб.", "tr": "Ya khachú kófe i khlyeb.", "pt": "Quero café e pão."}, {"cyr": "Сколько это стоит?", "tr": "Skólka éta stóit?", "pt": "Quanto custa?"}, {"cyr": "Двести рублей.", "tr": "Dvésti rubléy.", "pt": "Duzentos rublos."}, {"cyr": "Спасибо, очень вкусно!", "tr": "Spassíba, óchin fkúsna!", "pt": "Obrigado, muito gostoso!"}]}, {"afterLevel": 16, "title": "Na cidade", "ru": "В городе", "emoji": "🏙️", "sentences": [{"cyr": "Я турист в Москве.", "tr": "Ya turíst v Maskvyé.", "pt": "Sou turista em Moscou."}, {"cyr": "Извините, где метро?", "tr": "Izviníte, gdye mitró?", "pt": "Com licença, onde é o metrô?"}, {"cyr": "Идите прямо, потом налево.", "tr": "Idíte pryáma, patóm nalyéva.", "pt": "Vá reto, depois à esquerda."}, {"cyr": "Это далеко?", "tr": "Éta dalikó?", "pt": "É longe?"}, {"cyr": "Нет, близко.", "tr": "Nyet, blízka.", "pt": "Não, é perto."}, {"cyr": "Спасибо большое! Город красивый.", "tr": "Spassíba balshóye! Górat krasívy.", "pt": "Muito obrigado! A cidade é bonita."}]}, {"afterLevel": 18, "title": "O tempo hoje", "ru": "Погода сегодня", "emoji": "🌦️", "sentences": [{"cyr": "Сегодня хорошая погода.", "tr": "Sivódnya kharóshaya pagóda.", "pt": "Hoje o tempo está bom."}, {"cyr": "Утром было тепло.", "tr": "Útram býla tipló.", "pt": "De manhã estava quente."}, {"cyr": "Сейчас жарко.", "tr": "Siychás zhárka.", "pt": "Agora está quente."}, {"cyr": "Но завтра будет дождь.", "tr": "No záftra búdit dozht.", "pt": "Mas amanhã vai chover."}, {"cyr": "Зимой здесь холодно и много снега.", "tr": "Zimóy zdyes khóladna i mnóga snyéga.", "pt": "No inverno aqui é frio e neva muito."}, {"cyr": "Я люблю лето.", "tr": "Ya lyublyú lyéta.", "pt": "Eu gosto do verão."}]}, {"afterLevel": 19, "title": "O que eu gosto de fazer", "ru": "Что я люблю делать", "emoji": "❤️", "sentences": [{"cyr": "Я люблю мою работу.", "tr": "Ya lyublyú mayú rabótu.", "pt": "Amo o meu trabalho."}, {"cyr": "Утром я люблю кофе.", "tr": "Útram ya lyublyú kófe.", "pt": "De manhã gosto de café."}, {"cyr": "Я хочу учить русский язык.", "tr": "Ya khachú uchít rúski yazýk.", "pt": "Quero aprender a língua russa."}, {"cyr": "Я люблю спорт и футзал.", "tr": "Ya lyublyú sport i futzál.", "pt": "Gosto de esporte e futsal."}, {"cyr": "Каждый день я работаю и учусь.", "tr": "Kázhdy den ya rabótayu i uchús.", "pt": "Todo dia trabalho e estudo."}, {"cyr": "Это трудно, но интересно.", "tr": "Éta trúdna, no intiésna.", "pt": "É difícil, mas interessante."}]}, {"afterLevel": 22, "title": "Eu sou treinador", "ru": "Я тренер", "emoji": "🥅", "sentences": [{"cyr": "Меня зовут Лукас, я тренер.", "tr": "Minyá zavút Lukas, ya tryéner.", "pt": "Meu nome é Lucas, sou treinador."}, {"cyr": "Я тренер вратарей.", "tr": "Ya tryéner vrataréy.", "pt": "Sou treinador de goleiros."}, {"cyr": "Мой спорт — мини-футбол.", "tr": "Moy sport — míni-futból.", "pt": "Meu esporte é o futsal."}, {"cyr": "У меня хорошая команда.", "tr": "U minyá kharóshaya kamánda.", "pt": "Tenho um bom time."}, {"cyr": "Мы тренируемся каждый день.", "tr": "My triníruimsya kázhdy den.", "pt": "Treinamos todo dia."}, {"cyr": "Мой вратарь играет отлично.", "tr": "Moy vratár igráit atlíchna.", "pt": "Meu goleiro joga muito bem."}, {"cyr": "Сегодня матч. Гол! Мы выиграли!", "tr": "Sivódnya match. Gol! My výigrali!", "pt": "Hoje tem jogo. Gol! Ganhamos!"}]}, {"afterLevel": 23, "title": "O meu russo", "ru": "Мой русский", "emoji": "🇷🇺", "sentences": [{"cyr": "Я учу русский язык.", "tr": "Ya uchú rúski yazýk.", "pt": "Estou aprendendo russo."}, {"cyr": "Это трудно, но очень интересно.", "tr": "Éta trúdna, no óchin intiésna.", "pt": "É difícil, mas muito interessante."}, {"cyr": "Каждый день я учу новые слова.", "tr": "Kázhdy den ya uchú nóvye slavá.", "pt": "Todo dia aprendo palavras novas."}, {"cyr": "Теперь я немного говорю.", "tr": "Tipyér ya nimnóga gavaryú.", "pt": "Agora falo um pouco."}, {"cyr": "Я понимаю всё больше и больше.", "tr": "Ya panimáyu vsyo bólshe i bólshe.", "pt": "Entendo cada vez mais."}, {"cyr": "Русский язык очень красивый!", "tr": "Rúski yazýk óchin krasívy!", "pt": "A língua russa é muito bonita!"}]}];
+let curText=null, curTextIdx=null, readShowPt=false;
+function openRead(i){
+  curText=READTEXTS[i]; curTextIdx=i; readShowPt=false;
+  document.getElementById('rTitle').textContent=curText.title;
+  document.getElementById('rRu').textContent=curText.ru+' · '+curText.emoji;
+  document.getElementById('rToggle').textContent='👁️ Mostrar tradução';
+  renderRead();
+  document.getElementById('readScreen').classList.add('open');
+  window.scrollTo(0,0);
+}
+function closeRead(){ speechSynthesis.cancel(); document.getElementById('readScreen').classList.remove('open'); renderMap(); }
+function toggleReadPt(){ readShowPt=!readShowPt; document.getElementById('rToggle').textContent=readShowPt?'🙈 Ocultar tradução':'👁️ Mostrar tradução'; renderRead(); }
+function renderRead(){
+  const box=document.getElementById('readBox'); box.innerHTML='';
+  curText.sentences.forEach((st,idx)=>{
+    const c=document.createElement('div'); c.className='wcard'; c.id='rsent-'+idx; c.style.alignItems='flex-start';
+    c.innerHTML='<div class="body"><div class="cyr" style="font-size:22px;line-height:1.35">'+st.cyr+'</div><div class="tr">['+st.tr+']</div>'+(readShowPt?'<div class="pt">'+st.pt+'</div>':'')+'</div><div class="speak" title="Ouvir">🔊</div>';
+    const b=c.querySelector('.speak'); b.onclick=()=>speak(st.cyr,b);
+    box.appendChild(c);
+  });
+  const foot=document.getElementById('readFoot');
+  if(!state.readDone) state.readDone={};
+  foot.innerHTML = state.readDone[curTextIdx]
+    ? '<div style="text-align:center;color:var(--muted);margin-top:10px">✓ Texto concluído — releia quantas vezes quiser.</div>'
+    : '<button class="btn good wide" style="margin-top:8px" onclick="finishRead()">Li este texto ✓ (+15 XP)</button>';
+}
+function finishRead(){ if(!state.readDone) state.readDone={}; if(!state.readDone[curTextIdx]){ state.readDone[curTextIdx]=true; addXP(15); save(); } toast('Ótima leitura! 📖','good'); anchorSuccess(); renderRead(); }
+function playAllRead(){
+  if(!('speechSynthesis' in window)){ toast('Áudio não suportado','bad'); return; }
+  speechSynthesis.cancel();
+  curText.sentences.forEach((st,idx)=>{
+    const u=new SpeechSynthesisUtterance(String(st.cyr).replace(/…/g,''));
+    u.lang='ru-RU'; u.rate=.85; if(ruVoice) u.voice=ruVoice;
+    u.onstart=()=>{ const el=document.getElementById('rsent-'+idx); if(el){ el.style.borderColor='var(--accent)'; el.style.background='var(--card2)'; el.scrollIntoView({behavior:'smooth',block:'center'}); } };
+    u.onend=()=>{ const el=document.getElementById('rsent-'+idx); if(el){ el.style.borderColor='var(--line)'; el.style.background='var(--card)'; } };
+    speechSynthesis.speak(u);
+  });
+}
+function renderReadingSection(map){
+  const h=document.createElement('h2'); h.className='section'; h.textContent='📖 Leitura — Textos';
+  map.appendChild(h);
+  const sub=document.createElement('p'); sub.className='unit-sub'; sub.textContent='Textos curtos e progressivos. Leia primeiro sem tradução, depois confira e ouça.';
+  map.appendChild(sub);
+  const grid=document.createElement('div'); grid.className='levels';
+  READTEXTS.forEach((tx,i)=>{
+    const unlocked=state.completed[tx.afterLevel];
+    const done=state.readDone&&state.readDone[i];
+    const d=document.createElement('div'); d.className='lvl'+(unlocked?'':' locked');
+    d.innerHTML=(unlocked?(done?'<div class="done">✓ lido</div>':''):'<div class="lock">🔒</div>')+
+      '<div class="num">TEXTO '+(i+1)+' · '+tx.emoji+'</div>'+
+      '<div class="t">'+tx.title+'</div>'+
+      '<div class="ru">'+tx.ru+'</div>'+
+      '<div class="meta"><span>'+tx.sentences.length+' frases</span><span>'+(unlocked?'ler →':'conclua o nível '+(tx.afterLevel+1))+'</span></div>';
+    if(unlocked) d.onclick=()=>openRead(i);
+    grid.appendChild(d);
+  });
+  map.appendChild(grid);
+}
+
+/* ============================================================
+   UTIL / GAMIFICAÇÃO / PNL
+   ============================================================ */
+function addXP(n){ state.xp+=n; save(); document.getElementById('stXP').textContent=state.xp; }
+function shuffle(a){ a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function similar(a,b){
+  a=a.replace(/[.,!?]/g,''); b=b.replace(/[.,!?]/g,'');
+  if(a===b) return true;
+  if(a.length>2 && (a.includes(b)||b.includes(a))) return true;
+  let common=0; const bs=b.split('');
+  a.split('').forEach(ch=>{const k=bs.indexOf(ch); if(k>=0){common++;bs.splice(k,1);}});
+  return common/Math.max(a.length,b.length) > 0.6;
+}
+let toastT;
+function toast(msg,type){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show '+(type||'');
+  clearTimeout(toastT); toastT=setTimeout(()=>t.className='toast '+(type||''),1600);
+}
+let audioCtx;
+function anchorSuccess(){
+  try{
+    audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination); o.type='sine';
+    o.frequency.setValueAtTime(660,audioCtx.currentTime);
+    o.frequency.setValueAtTime(880,audioCtx.currentTime+0.09);
+    g.gain.setValueAtTime(0.12,audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.28);
+    o.start(); o.stop(audioCtx.currentTime+0.3);
+  }catch(e){}
+}
+const COACH=[
+  {m:"Bem-vindo, Lucas. Respire fundo e sorria — seu cérebro aprende melhor em estado positivo.",t:"PNL: imagine-se já falando russo com confiança antes de começar."},
+  {m:"Aprender um idioma é como treinar: pequenas repetições diárias vencem grandes esforços isolados.",t:"PNL: associe cada palavra a uma imagem vívida — quanto mais absurda, melhor você lembra."},
+  {m:"Erros não existem, só feedback. Cada tentativa te aproxima da fluência.",t:"PNL: reformule 'eu errei' para 'ainda estou aprendendo isto'."},
+  {m:"Você já domina um esporte de alto nível. A mesma disciplina te fará falar russo.",t:"PNL: ancore o sucesso — um gesto simples a cada acerto cria confiança."}
+];
+(function rotateCoach(){
+  const c=COACH[state.xp%COACH.length];
+  document.getElementById('coachMsg').textContent=c.m;
+  document.getElementById('coachTip').textContent="Dica "+c.t;
+})();
+
+renderMap();
+initFirebase();
+document.body.addEventListener('click',function unlock(){
+  if('speechSynthesis' in window){ const u=new SpeechSynthesisUtterance(' '); speechSynthesis.speak(u);}
+  document.body.removeEventListener('click',unlock);
+},{once:true});
+</script>
+</body>
+</html>
