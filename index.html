@@ -1635,7 +1635,7 @@ function renderSpeakQ(){
   }
   const w=words[spQ]; _curSpeakWord=w;
   const hasRec = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
-  const canSpeak = hasRec;
+  const canSpeak = IS_IOS ? (!!navigator.mediaDevices && !!window.MediaRecorder) : hasRec;
   p.innerHTML=`
     <div class="progressline"><i style="width:${(spQ/words.length)*100}%"></i></div>
     <div class="quizbox">
@@ -1644,7 +1644,7 @@ function renderSpeakQ(){
       <div class="tr" style="color:var(--muted);font-style:italic;margin-bottom:6px">[${w.tr}] — ${w.pt}</div>
       <button class="speak" style="margin:4px auto 6px;width:60px;height:60px" id="spPlay">🔊</button>
       <div><button class="mic" id="micBtn">🎤</button></div>
-      <div class="heard" id="heard">${canSpeak?'Toque no 🎤 e fale a palavra (ele finaliza sozinho)':'⚠️ Reconhecimento de voz indisponível — apenas repita em voz alta e avance'}</div>
+      <div class="heard" id="heard">${canSpeak?(IS_IOS?'Toque no 🎤, grave 5s e compare com o modelo':'Toque no 🎤 e fale a palavra (ele finaliza sozinho)'):'⚠️ Reconhecimento de voz indisponível — apenas repita em voz alta e avance'}</div>
       <div style="display:flex;gap:8px;margin-top:14px">
         <button class="btn ghost" style="flex:1" onclick="spSkip()">Repeti em voz alta ✓</button>
         <button class="btn primary" style="flex:1" onclick="spNext()">Próxima →</button>
@@ -1657,44 +1657,45 @@ function renderSpeakQ(){
 }
 var IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
 var _recAudio=null, _curSpeakWord=null, mediaRec=null, mediaChunks=[], mediaStream=null, recActive=false;
-function startSpeakInput(w){ _curSpeakWord=w; doRecognition(w); }
+function startSpeakInput(w){ _curSpeakWord=w; if(IS_IOS) doRecordPlayback(w); else doRecognition(w); }
 function _playMyRec(){ if(_recAudio){ try{ _recAudio.currentTime=0; _recAudio.play(); }catch(e){} } }
 function _rateSelf(ok){ if(ok){ addXP(5); anchorSuccess(); toast('Boa pronúncia! 🌟','good'); } }
-async function doRecordPlayback(w){
+function doRecordPlayback(w){
+  if(recBusy) return; recBusy=true;
   const mic=document.getElementById('micBtn'), heard=document.getElementById('heard');
-  if(recActive){ try{ mediaRec.stop(); }catch(e){} return; }
   speechSynthesis.cancel();
-  if(!navigator.mediaDevices || !window.MediaRecorder){ heard.textContent='Gravação não suportada aqui. Repita em voz alta e avance.'; return; }
-  try{ mediaStream=await navigator.mediaDevices.getUserMedia({audio:true}); }
-  catch(e){ heard.textContent='Preciso da permissão do microfone — toque em Permitir e tente de novo.'; return; }
-  mediaChunks=[];
-  try{ mediaRec=new MediaRecorder(mediaStream); }catch(e){ try{ mediaRec=new MediaRecorder(mediaStream,{mimeType:'audio/mp4'}); }catch(e2){ heard.textContent='Não consegui iniciar a gravação.'; return; } }
-  mediaRec.ondataavailable=(ev)=>{ if(ev.data && ev.data.size) mediaChunks.push(ev.data); };
-  mediaRec.onstop=()=>{
-    recActive=false; mic.classList.remove('rec');
-    if(mediaStream) mediaStream.getTracks().forEach(t=>t.stop());
-    const blob=new Blob(mediaChunks,{type:(mediaChunks[0]&&mediaChunks[0].type)||'audio/mp4'});
-    _recAudio=new Audio(URL.createObjectURL(blob));
-    heard.innerHTML='<div style="font-size:13px;color:var(--muted);margin-bottom:8px">🎙️ Gravado! Ouça o modelo e a sua voz e compare:</div>'
-      +'<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">'
-      +'<button class="btn ghost" onclick="speak(_curSpeakWord.cyr)">🔊 Modelo</button>'
-      +'<button class="btn primary" onclick="_playMyRec()">▶️ Minha voz</button></div>'
-      +'<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:8px">'
-      +'<button class="btn good" onclick="_rateSelf(true)">Soou parecido ✓ (+5)</button>'
-      +'<button class="btn ghost" onclick="startSpeakInput(_curSpeakWord)">Gravar de novo 🎤</button></div>';
-    mic.onclick=()=>startSpeakInput(_curSpeakWord);
-  };
-  try{ mediaRec.start(); }catch(e){ heard.textContent='Não consegui gravar. Tente de novo.'; return; }
-  recActive=true; mic.classList.add('rec');
-  heard.innerHTML='🔴 <b>Gravando...</b> fale e toque no 🎤 para parar';
-  mic.onclick=()=>doRecordPlayback(w);
-  setTimeout(()=>{ if(recActive){ try{ mediaRec.stop(); }catch(e){} } }, 6000);
+  if(!navigator.mediaDevices || !window.MediaRecorder){ recBusy=false; heard.textContent='Gravação não suportada aqui. Repita em voz alta e avance.'; return; }
+  navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+    var chunks=[], mr;
+    try{ mr=new MediaRecorder(stream); }catch(e){ try{ mr=new MediaRecorder(stream,{mimeType:'audio/mp4'}); }catch(e2){ recBusy=false; mic.classList.remove('rec'); heard.textContent='Não consegui iniciar a gravação.'; stream.getTracks().forEach(function(t){t.stop();}); return; } }
+    mr.ondataavailable=function(ev){ if(ev.data&&ev.data.size) chunks.push(ev.data); };
+    mr.onstop=function(){
+      recBusy=false; mic.classList.remove('rec');
+      stream.getTracks().forEach(function(t){t.stop();});
+      var blob=new Blob(chunks,{type:(chunks[0]&&chunks[0].type)||'audio/mp4'});
+      _recAudio=new Audio(URL.createObjectURL(blob));
+      heard.innerHTML='<div style="font-size:13px;color:var(--muted);margin-bottom:8px">🎙️ Gravado! Ouça o modelo e a sua voz e compare:</div>'
+        +'<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">'
+        +'<button class="btn ghost" onclick="speak(_curSpeakWord.cyr)">🔊 Modelo</button>'
+        +'<button class="btn primary" onclick="_playMyRec()">▶️ Minha voz</button></div>'
+        +'<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:8px">'
+        +'<button class="btn good" onclick="_rateSelf(true)">Soou parecido ✓ (+5)</button>'
+        +'<button class="btn ghost" onclick="startSpeakInput(_curSpeakWord)">Gravar de novo 🎤</button></div>';
+      mic.onclick=function(){ startSpeakInput(_curSpeakWord); };
+    };
+    mic.classList.add('rec');
+    var secs=5;
+    heard.innerHTML='🔴 <b>Gravando...</b> fale agora ('+secs+'s)';
+    var iv=setInterval(function(){ secs--; if(secs>0) heard.innerHTML='🔴 <b>Gravando...</b> fale agora ('+secs+'s)'; },1000);
+    try{ mr.start(); }catch(e){ clearInterval(iv); recBusy=false; mic.classList.remove('rec'); heard.textContent='Não consegui gravar.'; stream.getTracks().forEach(function(t){t.stop();}); return; }
+    setTimeout(function(){ clearInterval(iv); try{ mr.stop(); }catch(e){} },5000);
+  }).catch(function(e){ recBusy=false; mic.classList.remove('rec'); heard.textContent='Preciso da permissão do microfone — toque em Permitir e tente de novo.'; });
 }
 var recBusy=false;
 function doRecognition(w){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){ toast("Use Chrome ou Edge para o microfone","bad"); return; }
-  if(recBusy) return; // ignora toques repetidos / clique fantasma do iOS
+  if(recBusy) return;
   recBusy=true;
   speechSynthesis.cancel();
   const mic=document.getElementById('micBtn'), heard=document.getElementById('heard');
@@ -1702,8 +1703,7 @@ function doRecognition(w){
   let finalAlts=[], bestInterim='', graded=false, rec=null, maxTimer=null;
   function grade(){
     if(graded) return; graded=true;
-    recBusy=false;
-    clearTimeout(maxTimer);
+    recBusy=false; clearTimeout(maxTimer);
     mic.classList.remove('rec');
     const said = finalAlts.length ? finalAlts : (bestInterim ? [bestInterim.toLowerCase()] : []);
     if(!said.length){ heard.textContent='Não captei sua voz. Toque no 🎤 e fale a palavra logo em seguida.'; return; }
@@ -1714,31 +1714,28 @@ function doRecognition(w){
   }
   mic.classList.add('rec');
   heard.innerHTML='🔴 <b>Ouvindo...</b> fale a palavra agora';
-  // pequeno atraso para liberar o áudio do TTS antes de abrir o microfone (importante no iOS)
-  setTimeout(function(){
-    try{
-      rec=new SR(); rec.lang='ru-RU'; rec.interimResults=true; rec.continuous=false; rec.maxAlternatives=3;
-      rec.onresult=(ev)=>{
-        let interim='';
-        for(const res of ev.results){
-          if(res.isFinal){ finalAlts=[...res].map(a=>a.transcript.toLowerCase().trim()); }
-          else interim+=res[0].transcript;
-        }
-        if(interim.trim()) bestInterim=interim.trim();
-        const live=(finalAlts[0]||bestInterim).trim();
-        if(live) heard.innerHTML='Ouvindo: <b style="color:var(--warn)">'+live+'</b>';
-        if(finalAlts.length){ try{ rec.stop(); }catch(e){} }
-      };
-      rec.onerror=(ev)=>{
-        if(ev.error==='not-allowed'||ev.error==='service-not-allowed'){ toast('Microfone bloqueado. Permita o acesso e recarregue.','bad'); }
-        else if(ev.error==='audio-capture'){ toast('Nenhum microfone encontrado.','bad'); }
-        else if(ev.error==='network'){ toast('Sem internet — o reconhecimento precisa de conexão.','bad'); }
-      };
-      rec.onend=()=>grade();
-      rec.start();
-      maxTimer=setTimeout(function(){ try{ rec.stop(); }catch(e){} }, 10000);
-    }catch(e){ recBusy=false; mic.classList.remove('rec'); heard.textContent='Toque no 🎤 de novo'; }
-  }, 250);
+  try{
+    rec=new SR(); rec.lang='ru-RU'; rec.interimResults=true; rec.continuous=false; rec.maxAlternatives=3;
+    rec.onresult=(ev)=>{
+      let interim='';
+      for(const res of ev.results){
+        if(res.isFinal){ finalAlts=[...res].map(a=>a.transcript.toLowerCase().trim()); }
+        else interim+=res[0].transcript;
+      }
+      if(interim.trim()) bestInterim=interim.trim();
+      const live=(finalAlts[0]||bestInterim).trim();
+      if(live) heard.innerHTML='Ouvindo: <b style="color:var(--warn)">'+live+'</b>';
+      if(finalAlts.length){ try{ rec.stop(); }catch(e){} }
+    };
+    rec.onerror=(ev)=>{
+      if(ev.error==='not-allowed'||ev.error==='service-not-allowed'){ toast('Microfone bloqueado. Permita o acesso e recarregue.','bad'); }
+      else if(ev.error==='audio-capture'){ toast('Nenhum microfone encontrado.','bad'); }
+      else if(ev.error==='network'){ toast('Sem internet — o reconhecimento precisa de conexão.','bad'); }
+    };
+    rec.onend=()=>grade();
+    rec.start(); // início SÍNCRONO no toque (iOS exige isto)
+    maxTimer=setTimeout(function(){ try{ rec.stop(); }catch(e){} }, 10000);
+  }catch(e){ recBusy=false; mic.classList.remove('rec'); heard.textContent='Toque no 🎤 de novo'; }
 }
 
 /* ===== Diagnóstico de microfone ===== */
