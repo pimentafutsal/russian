@@ -1643,7 +1643,7 @@ function renderSpeakQ(){
       <div class="tr" style="color:var(--muted);font-style:italic;margin-bottom:6px">[${w.tr}] — ${w.pt}</div>
       <button class="speak" style="margin:4px auto 6px;width:60px;height:60px" id="spPlay">🔊</button>
       <div><button class="mic" id="micBtn">🎤</button></div>
-      <div class="heard" id="heard">${hasRec?'Toque no microfone e fale':'⚠️ Reconhecimento de voz indisponível — apenas repita em voz alta e avance'}</div>
+      <div class="heard" id="heard">${hasRec?'Toque no 🎤, fale, e toque de novo para finalizar':'⚠️ Reconhecimento de voz indisponível — apenas repita em voz alta e avance'}</div>
       <div style="display:flex;gap:8px;margin-top:14px">
         <button class="btn ghost" style="flex:1" onclick="spSkip()">Repeti em voz alta ✓</button>
         <button class="btn primary" style="flex:1" onclick="spNext()">Próxima →</button>
@@ -1657,42 +1657,51 @@ function renderSpeakQ(){
 function doRecognition(w){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){ toast("Use Chrome ou Edge para o microfone","bad"); return; }
-  speechSynthesis.cancel(); // silencia o TTS para não atrapalhar o mic
+  speechSynthesis.cancel();
   const rec=new SR(); rec.lang='ru-RU'; rec.interimResults=true; rec.continuous=false; rec.maxAlternatives=3;
   const mic=document.getElementById('micBtn'), heard=document.getElementById('heard');
-  let got=false;
-  mic.classList.add('rec'); heard.innerHTML='🔴 <b>Ouvindo...</b> fale agora';
-  try{ rec.start(); }catch(e){ mic.classList.remove('rec'); heard.textContent='Já estava ouvindo — toque de novo'; return; }
+  const target=w.cyr.replace(/…/g,'').toLowerCase().trim();
+  let finalAlts=[], bestInterim='', graded=false, stopTimer=null;
+  function finish(){
+    if(graded) return; graded=true;
+    clearTimeout(stopTimer);
+    mic.classList.remove('rec');
+    mic.onclick=()=>doRecognition(w); // pronto para nova tentativa
+    const said = finalAlts.length ? finalAlts : (bestInterim ? [bestInterim.toLowerCase()] : []);
+    if(!said.length){ heard.textContent='Não captei sua voz. Fale mais perto e toque no 🎤 de novo.'; return; }
+    const hit=said.some(s=>similar(s,target));
+    heard.innerHTML='Você disse: <b style="color:'+(hit?'var(--good)':'var(--warn)')+'">'+said[0]+'</b>';
+    if(hit){ toast("Pronúncia reconhecida! 🌟","good"); anchorSuccess(); addXP(5); }
+    else{ toast("Quase! Ouça de novo e imite o som","bad"); }
+  }
+  mic.classList.add('rec');
+  heard.innerHTML='🔴 <b>Ouvindo...</b> fale e toque no 🎤 para finalizar';
+  mic.onclick=()=>{ try{ rec.stop(); }catch(e){} }; // toque para parar e verificar
+  try{ rec.start(); }catch(e){ mic.classList.remove('rec'); mic.onclick=()=>doRecognition(w); heard.textContent='Toque no 🎤 de novo'; return; }
+  stopTimer=setTimeout(()=>{ try{ rec.stop(); }catch(e){} }, 8000);
   rec.onresult=(ev)=>{
-    let interim='', finalTxt='';
-    for(const r of ev.results){ if(r.isFinal) finalTxt+=r[0].transcript; else interim+=r[0].transcript; }
-    const shown=(finalTxt||interim).trim();
-    if(shown){ got=true; heard.innerHTML='Você disse: <b style="color:var(--warn)">'+shown+'</b>'; }
-    const last=ev.results[ev.results.length-1];
-    if(last.isFinal){
-      const alts=[...last].map(r=>r.transcript.toLowerCase().trim());
-      const target=w.cyr.replace(/…/g,'').toLowerCase().trim();
-      const hit=alts.some(s=>similar(s,target));
-      heard.innerHTML='Você disse: <b style="color:'+(hit?'var(--good)':'var(--warn)')+'">'+alts[0]+'</b>';
-      if(hit){ toast("Pronúncia reconhecida! 🌟","good"); anchorSuccess(); addXP(5); }
-      else{ toast("Quase! Ouça de novo e imite o som","bad"); }
+    let interim='';
+    for(const r of ev.results){
+      if(r.isFinal){ finalAlts=[...r].map(a=>a.transcript.toLowerCase().trim()); }
+      else interim+=r[0].transcript;
     }
+    if(interim.trim()) bestInterim=interim.trim();
+    const live=(finalAlts[0]||bestInterim).trim();
+    if(live) heard.innerHTML='Ouvindo: <b style="color:var(--warn)">'+live+'</b>';
+    if(finalAlts.length) finish(); // resultado final chegou: já verifica
   };
   rec.onerror=(e)=>{
-    mic.classList.remove('rec');
     const map={
-      'not-allowed':'⚠️ Microfone bloqueado. Cadeado da barra de endereço → Microfone → Permitir, e recarregue.',
-      'service-not-allowed':'⚠️ Microfone bloqueado pelo sistema. Verifique as permissões do navegador.',
-      'no-speech':'Não ouvi nada. Fale mais alto e mais perto do microfone.',
-      'audio-capture':'Nenhum microfone encontrado. Verifique o mic conectado/selecionado.',
-      'network':'Sem internet. O reconhecimento do Chrome precisa de conexão.',
-      'aborted':'Gravação interrompida. Toque de novo.'
+      'not-allowed':'⚠️ Microfone bloqueado. Permita o microfone e recarregue.',
+      'service-not-allowed':'⚠️ Microfone bloqueado pelo sistema. Verifique as permissões.',
+      'no-speech':'Não ouvi nada. Fale mais alto e mais perto.',
+      'audio-capture':'Nenhum microfone encontrado.',
+      'network':'Sem internet. O reconhecimento precisa de conexão.',
+      'aborted':''
     };
-    heard.textContent=map[e.error]||('Erro: '+e.error);
-    if((e.error==='not-allowed'||e.error==='service-not-allowed') && location.protocol==='file:')
-      heard.innerHTML+='<br><small>Você abriu como arquivo — o Chrome bloqueia mic em file://. Use o atalho "Abrir Russo do Zero.command".</small>';
+    if(map[e.error]) toast(map[e.error],'bad');
   };
-  rec.onend=()=>{ mic.classList.remove('rec'); if(!got && !heard.innerHTML.includes('disse')) heard.textContent='Não captei sua voz — tente o botão "Testar microfone" na tela inicial.'; };
+  rec.onend=()=>finish();
 }
 
 /* ===== Diagnóstico de microfone ===== */
