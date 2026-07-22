@@ -241,6 +241,13 @@
   </div>
 </div>
 
+<!-- RESOURCE SCREENS -->
+<div class="screen" id="gramScreen"><div class="wrap"><div class="lhead"><div class="back" onclick="closeGram()">←</div><div><h2>Gramática Essencial</h2><div class="ru">Грамматика · 🔑</div></div></div><div id="gramBox"></div></div></div>
+<div class="screen" id="cronoScreen"><div class="wrap"><div class="lhead"><div class="back" onclick="closeCrono()">←</div><div><h2>Cronograma de Estudos</h2><div class="ru">План · 🗓️</div></div></div><div id="cronoBox"></div></div></div>
+<div class="screen" id="palScreen"><div class="wrap"><div class="lhead"><div class="back" onclick="closePal()">←</div><div><h2>Palavras do Dia</h2><div class="ru">Слова дня · 🆕</div></div></div><div id="palBox"></div></div></div>
+
+<div class="screen" id="exScreen"><div class="wrap"><div class="lhead"><div class="back" onclick="closeEx()">←</div><div><h2>Exercícios</h2><div class="ru">Упражнения · 🎯</div></div></div><div id="exBox"></div></div></div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
@@ -269,7 +276,10 @@ function mergeStates(a,b){
     lastDay: ((a.lastDay||'')>(b.lastDay||'') ? a.lastDay : b.lastDay) || new Date().toISOString().slice(0,10),
     completed: Object.assign({}, a.completed, b.completed),
     convDone: Object.assign({}, a.convDone, b.convDone),
-    readDone: Object.assign({}, a.readDone, b.readDone)
+    readDone: Object.assign({}, a.readDone, b.readDone),
+    dailyStart: Math.max(a.dailyStart||0, b.dailyStart||0),
+    dailyDays: ((a.dailyDays||[]).length >= (b.dailyDays||[]).length) ? (a.dailyDays||[]) : (b.dailyDays||[]),
+    lastDailyDate: ((a.lastDailyDate||'')>(b.lastDailyDate||'') ? a.lastDailyDate : b.lastDailyDate) || ''
   };
 }
 function saveCloud(){
@@ -1397,7 +1407,7 @@ const KEY="russo_do_zero_v2";
 let state = load();
 function load(){
   try{ const s=JSON.parse(localStorage.getItem(KEY)); if(s) return s; }catch(e){}
-  return {xp:0, streak:1, lastDay:todayStr(), completed:{}, convDone:{}};
+  return {xp:0, streak:1, lastDay:todayStr(), completed:{}, convDone:{}, readDone:{}, dailyStart:0, dailyDays:[], lastDailyDate:''};
 }
 function save(){ try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){} saveCloud(); }
 function todayStr(){ return new Date().toISOString().slice(0,10); }
@@ -1472,6 +1482,7 @@ function runAudioTest(){
 function isUnlocked(id){ return id===0 || state.completed[id-1]; }
 function countDone(){ return LEVELS.filter(l=>state.completed[l.id]).length; }
 function renderMap(){
+  ensureDaily();
   document.getElementById('stXP').textContent=state.xp;
   document.getElementById('stStreak').textContent=state.streak;
   const cur=LEVELS.findIndex(l=>!state.completed[l.id]);
@@ -1481,6 +1492,7 @@ function renderMap(){
   document.getElementById('ovBar').style.width=(done/LEVELS.length*100)+"%";
 
   const map=document.getElementById('levelMap'); map.innerHTML='';
+  renderResourcesSection(map);
   UNITS.forEach(u=>{
     const h=document.createElement('h2'); h.className='section'; h.textContent='Unidade '+u.id+' · '+u.name;
     map.appendChild(h);
@@ -1941,6 +1953,201 @@ function renderReadingSection(map){
     grid.appendChild(d);
   });
   map.appendChild(grid);
+}
+
+/* ============================================================
+   RECURSOS: Gramática, Cronograma e Palavras do Dia
+   ============================================================ */
+const GRAMMAR = [{"t": "O russo dispensa o \"ser\"", "ru": "Настоящее время", "emoji": "🟰", "blocks": [{"type": "p", "text": "No <b>presente</b>, o russo normalmente NÃO usa o verbo \"ser/estar\". Você simplesmente junta as duas partes — o \"é/são/sou\" fica subentendido."}, {"type": "ex", "cyr": "Я тренер.", "tr": "Ya tryéner.", "pt": "Eu (sou) treinador."}, {"type": "ex", "cyr": "Он вратарь.", "tr": "On vratár.", "pt": "Ele (é) goleiro."}, {"type": "ex", "cyr": "Это мяч.", "tr": "Éta myach.", "pt": "Isto (é) uma bola."}, {"type": "ex", "cyr": "Москва большая.", "tr": "Maskvá balsháya.", "pt": "Moscou (é) grande."}, {"type": "p", "text": "Simples assim: sujeito + resto, sem \"ser\" no meio."}]}, {"t": "Gênero: masculino, feminino, neutro", "ru": "Род", "emoji": "⚥", "blocks": [{"type": "p", "text": "Todo substantivo tem um gênero, e dá para adivinhar pela <b>última letra</b>:"}, {"type": "p", "text": "<b>Masculino</b> — termina em consoante: стол (mesa), брат (irmão), футбол."}, {"type": "p", "text": "<b>Feminino</b> — termina em -а ou -я: мама, вода, семья."}, {"type": "p", "text": "<b>Neutro</b> — termina em -о ou -е: окно (janela), море (mar), метро."}, {"type": "p", "text": "Importa porque o adjetivo muda conforme o gênero:"}, {"type": "ex", "cyr": "красный мяч", "tr": "krásny myach", "pt": "bola vermelha (masc.)"}, {"type": "ex", "cyr": "красная машина", "tr": "krásnaya mashýna", "pt": "carro vermelho (fem.)"}, {"type": "ex", "cyr": "красное море", "tr": "krásnaye móre", "pt": "mar vermelho (neutro)"}]}, {"t": "Pronomes: eu, você, meu, seu", "ru": "Местоимения", "emoji": "🧑", "blocks": [{"type": "p", "text": "<b>Pessoais:</b> я (eu), ты (você), он (ele), она (ela), оно (isso), мы (nós), вы (vocês/você formal), они (eles)."}, {"type": "ex", "cyr": "Он и она", "tr": "On i aná", "pt": "Ele e ela"}, {"type": "ex", "cyr": "Мы и вы", "tr": "My i vy", "pt": "Nós e vocês"}, {"type": "p", "text": "<b>Possessivos</b> concordam com o gênero da coisa possuída: мой (meu-masc), моя (minha-fem), моё (meu-neutro); o mesmo com твой/твоя/твоё (teu)."}, {"type": "ex", "cyr": "мой брат", "tr": "moy brat", "pt": "meu irmão"}, {"type": "ex", "cyr": "моя команда", "tr": "mayá kamánda", "pt": "meu time"}, {"type": "ex", "cyr": "моё имя", "tr": "mayó ímya", "pt": "meu nome"}]}, {"t": "Verbos no presente", "ru": "Глаголы", "emoji": "🏃", "blocks": [{"type": "p", "text": "O verbo muda a terminação conforme <b>quem</b> faz a ação. Veja знать (saber):"}, {"type": "ex", "cyr": "Я знаю", "tr": "Ya znáyu", "pt": "Eu sei"}, {"type": "ex", "cyr": "Ты знаешь", "tr": "Ty znáyesh", "pt": "Você sabe"}, {"type": "ex", "cyr": "Он/она знает", "tr": "On/aná znáyet", "pt": "Ele/ela sabe"}, {"type": "ex", "cyr": "Мы знаем", "tr": "My znáyem", "pt": "Nós sabemos"}, {"type": "ex", "cyr": "Вы знаете", "tr": "Vy znáyete", "pt": "Vocês sabem"}, {"type": "ex", "cyr": "Они знают", "tr": "Aní znáyut", "pt": "Eles sabem"}, {"type": "p", "text": "A maioria segue o padrão de terminações <b>-ю / -ешь / -ет / -ем / -ете / -ют</b>. Domine primeiro o \"eu\" e o \"você\" — são os que você mais usa."}]}, {"t": "Perguntar e negar", "ru": "Вопрос и отрицание", "emoji": "❓", "blocks": [{"type": "p", "text": "<b>Negar</b> é fácil: coloque <b>не</b> antes do verbo ou da palavra."}, {"type": "ex", "cyr": "Я не знаю", "tr": "Ya ni znáyu", "pt": "Eu não sei"}, {"type": "ex", "cyr": "Это не мяч", "tr": "Éta ni myach", "pt": "Isto não é uma bola"}, {"type": "p", "text": "<b>Pergunta sim/não:</b> use a MESMA frase, só subindo a entonação no fim."}, {"type": "ex", "cyr": "Ты тренер?", "tr": "Ty tryéner?", "pt": "Você é treinador?"}, {"type": "p", "text": "<b>Perguntas abertas</b> usam: кто (quem), что (o quê), где (onde), когда (quando), почему (por quê), как (como), сколько (quanto)."}, {"type": "ex", "cyr": "Где вода?", "tr": "Gdye vadá?", "pt": "Onde está a água?"}]}, {"t": "Casos: por que os finais mudam", "ru": "Падежи", "emoji": "🔑", "blocks": [{"type": "p", "text": "No russo, o final do substantivo muda conforme a <b>função</b> dele na frase. Assusta no início, mas comece só com três usos:"}, {"type": "p", "text": "<b>1) Sujeito</b> (quem faz) = forma do dicionário."}, {"type": "ex", "cyr": "Вода здесь.", "tr": "Vadá zdyes.", "pt": "A água está aqui."}, {"type": "p", "text": "<b>2) Objeto direto</b> (o que recebe a ação): feminino -а vira -у."}, {"type": "ex", "cyr": "Я хочу воду.", "tr": "Ya khachú vádu.", "pt": "Eu quero água. (вода → воду)"}, {"type": "ex", "cyr": "Я люблю Москву.", "tr": "Ya lyublyú Maskvú.", "pt": "Eu amo Moscou. (Москва → Москву)"}, {"type": "p", "text": "<b>3) Lugar</b> (onde), com в/на: costuma terminar em -е."}, {"type": "ex", "cyr": "Я в Москве.", "tr": "Ya v Maskvyé.", "pt": "Estou em Moscou. (Москва → Москве)"}, {"type": "ex", "cyr": "Я на работе.", "tr": "Ya na rabóte.", "pt": "Estou no trabalho. (работа → работе)"}, {"type": "p", "text": "<b>Regra de ouro:</b> \"para onde\" (movimento) usa -у (в Москву); \"onde\" (lugar) usa -е (в Москве). Só isso já resolve muita coisa."}]}, {"t": "Plural", "ru": "Множественное число", "emoji": "👥", "blocks": [{"type": "p", "text": "Para \"mais de um\", o final muda, quase sempre para <b>-ы</b> ou <b>-и</b>:"}, {"type": "ex", "cyr": "стол → столы", "tr": "stol → stalý", "pt": "mesa → mesas"}, {"type": "ex", "cyr": "книга → книги", "tr": "kníga → knígi", "pt": "livro → livros"}, {"type": "ex", "cyr": "брат → братья", "tr": "brat → brátya", "pt": "irmão → irmãos (irregular)"}, {"type": "p", "text": "Depois de к, г, х, ж, ч, ш, щ use -и (regra de ortografia). Não decore tudo agora — só reconheça: <b>-ы/-и no fim = plural</b>."}]}, {"t": "Juntando tudo: monte suas frases", "ru": "Собираем фразу", "emoji": "🧩", "blocks": [{"type": "p", "text": "Com o que você viu, já monta frases próprias:"}, {"type": "ex", "cyr": "Я тренер, я из Бразилии.", "tr": "Ya tryéner, ya iz Brazílii.", "pt": "Sou treinador, sou do Brasil."}, {"type": "ex", "cyr": "Я не знаю, где вокзал.", "tr": "Ya ni znáyu, gdye vagzál.", "pt": "Não sei onde é a estação."}, {"type": "ex", "cyr": "Моя команда играет в футзал.", "tr": "Mayá kamánda igráit v futzál.", "pt": "Meu time joga futsal."}, {"type": "ex", "cyr": "Я хочу воду, пожалуйста.", "tr": "Ya khachú vádu, pazhálusta.", "pt": "Quero água, por favor."}, {"type": "p", "text": "Cada frase sua é uma vitória. Releia em voz alta e ancore o sucesso. 🧠"}]}];
+const CRONO_HTML = `<div style="background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:14px">
+<b>Rotina diária (~25–35 min)</b>
+<ol style="margin:8px 0 0;padding-left:20px;line-height:1.7">
+<li><b>Aquecimento (2 min):</b> respire, sorria, visualize-se falando russo.</li>
+<li><b>Palavras do dia (5–7 min):</b> abra "Palavras do Dia", ouça 🔊 e repita em voz alta.</li>
+<li><b>Lição principal (12–15 min):</b> Aprender → Ouvir → Falar → Revisar.</li>
+<li><b>Aplicação (5–8 min):</b> 1 diálogo OU 1 texto de leitura.</li>
+<li><b>Revisão (3–5 min):</b> aba Revisar da lição anterior + palavras de ontem.</li>
+</ol>
+<p style="color:var(--muted);font-size:13px;margin:10px 0 0">🎙️ Fala: 3×/semana no notebook (Chrome, reconhecimento); no iPad, grave e compare.</p></div>
+<div style="background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:14px">
+<b>Ritmo semanal:</b> 5 dias completos · 1 dia de consolidação (refazer Ouvir/Falar e reler textos) · 1 dia leve (só as 20 palavras, para manter a sequência 🔥).</div>
+<h3 style="color:var(--ru);margin:16px 2px 8px">Plano de 12 semanas</h3>
+<table style="width:100%;border-collapse:collapse;font-size:13px">
+<tr style="color:var(--accent2)"><th style="text-align:left;padding:8px;border-bottom:1px solid var(--line)">Sem.</th><th style="text-align:left;padding:8px;border-bottom:1px solid var(--line)">Foco e materiais</th></tr>
+<tr><td style="padding:8px;border-bottom:1px solid var(--line);color:var(--ru);font-weight:800">1</td><td style="padding:8px;border-bottom:1px solid var(--line)">Alfabeto — Níveis 1–2 (ler letras e primeiras palavras)</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid var(--line);color:var(--ru);font-weight:800">2</td><td style="padding:8px;border-bottom:1px solid var(--line)">Alfabeto completo — Níveis 3–5 (você lê qualquer palavra)</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid var(--line);color:var(--ru);font-weight:800">3</td><td style="padding:8px;border-bottom:1px solid var(--line)">Níveis 5–6 · Diálogos 1–3 · Texto 1 · <b>Gramática 1–2</b></td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid var(--line);color:var(--ru);font-weight:800">4</td><td style="padding:8px;border-bottom:1px solid var(--line)">Nível 7 (cortesia) · Diálogo 4 · <b>Gramática 3</b> · revisão</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid var(--line);color:var(--ru);font-weight:800">5</td><td style="padding:8px;border-bottom:1px solid var(--line)">Números — Níveis 8–9 · Diálogos 5–6</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid var(--line);color:var(--ru);font-weight:800">6</td><td style="padding:8px;border-bottom:1px solid var(--line)">Família e cores — Níveis 10–11 · Diálogos 7–8 · Textos 2–3 · <b>Gramática 4</b></td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid var(--line);color:var(--ru);font-weight:800">7</td><td style="padding:8px;border-bottom:1px solid var(--line)">Tempo — Nível 12 · Diálogos 9–10 · Texto 4 · <b>Gramática 5</b></td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid var(--line);color:var(--ru);font-weight:800">8</td><td style="padding:8px;border-bottom:1px solid var(--line)">Comida/restaurante — Níveis 13–14 · Diálogos 11–13 · Texto 5 · <b>Gramática 6</b></td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid var(--line);color:var(--ru);font-weight:800">9</td><td style="padding:8px;border-bottom:1px solid var(--line)">Compras/direções — Níveis 15–16 · Diálogos 14–16 · Texto 6</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid var(--line);color:var(--ru);font-weight:800">10</td><td style="padding:8px;border-bottom:1px solid var(--line)">Transporte/clima — Níveis 17–18 · Diálogos 17–21 · Texto 7 · <b>Gramática 7</b></td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid var(--line);color:var(--ru);font-weight:800">11</td><td style="padding:8px;border-bottom:1px solid var(--line)">Verbos/perguntas — Níveis 19–20 · Diálogos 22–24 · Texto 8</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid var(--line);color:var(--ru);font-weight:800">12</td><td style="padding:8px;border-bottom:1px solid var(--line)">Saúde/esporte/conversa — Níveis 21–23 · Diálogos 25–30 · Textos 9–10 · <b>Gramática 8</b></td></tr>
+</table>
+<div style="background:rgba(255,207,92,.08);border:1px solid rgba(255,207,92,.35);border-radius:14px;padding:14px 16px;margin-top:16px;font-size:13px;line-height:1.6">
+<b style="color:var(--warn)">Ainda dá para incluir:</b> revisão cumulativa semanal · áudio de voz humana (recursos externos) · folha de caligrafia do cirílico · parceiro de conversa real a partir da Semana 8. Peça ao Claude quando quiser qualquer um desses.</div>`;
+var WORDBANK = [{"cyr": "и", "tr": "i", "pt": "e", "mn": "une A i B, um elo"}, {"cyr": "но", "tr": "no", "pt": "mas", "mn": "\"no\" freia a ideia"}, {"cyr": "или", "tr": "íli", "pt": "ou", "mn": "aqui ili lá?"}, {"cyr": "потому что", "tr": "patamú shta", "pt": "porque", "mn": "a razão de tudo"}, {"cyr": "поэтому", "tr": "paétamu", "pt": "por isso", "mn": "logo, conclusão"}, {"cyr": "сейчас", "tr": "siychás", "pt": "agora", "mn": "\"sei? chás!\""}, {"cyr": "всегда", "tr": "vsigdá", "pt": "sempre", "mn": "vai sempre dar"}, {"cyr": "никогда", "tr": "nikagdá", "pt": "nunca", "mn": "nega o sempre"}, {"cyr": "иногда", "tr": "inagdá", "pt": "às vezes", "mn": "de vez em quando"}, {"cyr": "часто", "tr": "chásta", "pt": "frequentemente", "mn": "chá a toda hora"}, {"cyr": "очень", "tr": "óchin", "pt": "muito", "mn": "reforça tudo"}, {"cyr": "тоже", "tr": "tózhe", "pt": "também", "mn": "to' também nessa"}, {"cyr": "только", "tr": "tólka", "pt": "só/apenas", "mn": "toca só isto"}, {"cyr": "уже", "tr": "uzhé", "pt": "já", "mn": "ó, já!"}, {"cyr": "ещё", "tr": "yeschó", "pt": "ainda/mais", "mn": "quero mais um"}, {"cyr": "можно", "tr": "mózhna", "pt": "pode?/permitido", "mn": "posso? licença"}, {"cyr": "нужно", "tr": "núzhna", "pt": "é preciso", "mn": "necessidade"}, {"cyr": "надо", "tr": "náda", "pt": "tem que", "mn": "\"nada\" com força"}, {"cyr": "давай", "tr": "daváy", "pt": "vamos/vai", "mn": "dá, vai!"}, {"cyr": "конечно", "tr": "kanyéshna", "pt": "claro", "mn": "óbvio"}, {"cyr": "этот", "tr": "éstat", "pt": "este", "mn": "aponta: est-e"}, {"cyr": "тот", "tr": "tot", "pt": "aquele", "mn": "aquele lá"}, {"cyr": "такой", "tr": "takóy", "pt": "tal/assim", "mn": "desse jeito"}, {"cyr": "который", "tr": "katóry", "pt": "o qual/que", "mn": "o qual deles"}, {"cyr": "весь", "tr": "ves", "pt": "todo", "mn": "tudo inteiro"}, {"cyr": "каждый", "tr": "kázhdy", "pt": "cada", "mn": "um a um"}, {"cyr": "другой", "tr": "drugóy", "pt": "outro", "mn": "o segundo, o outro"}, {"cyr": "сам", "tr": "sam", "pt": "mesmo/próprio", "mn": "eu mesmo"}, {"cyr": "здесь", "tr": "zdyes", "pt": "aqui", "mn": "desce aqui"}, {"cyr": "там", "tr": "tam", "pt": "lá", "mn": "lá além"}, {"cyr": "сюда", "tr": "syudá", "pt": "para cá", "mn": "vem pra cá"}, {"cyr": "туда", "tr": "tudá", "pt": "para lá", "mn": "vai pra lá"}, {"cyr": "сначала", "tr": "snachála", "pt": "no início", "mn": "primeiro de tudo"}, {"cyr": "потом", "tr": "patóm", "pt": "depois", "mn": "em seguida"}, {"cyr": "вместе", "tr": "vmésti", "pt": "juntos", "mn": "na mesma"}, {"cyr": "снова", "tr": "snóva", "pt": "de novo", "mn": "outra vez"}, {"cyr": "тогда", "tr": "tagdá", "pt": "então/naquele tempo", "mn": "naquela hora"}, {"cyr": "значит", "tr": "znáchit", "pt": "significa/então", "mn": "quer dizer"}, {"cyr": "например", "tr": "naprimyér", "pt": "por exemplo", "mn": "um exemplo"}, {"cyr": "наверное", "tr": "navyérnaye", "pt": "provavelmente", "mn": "deve ser"}, {"cyr": "быть", "tr": "byt", "pt": "ser/estar", "mn": "to be"}, {"cyr": "мочь", "tr": "moch", "pt": "poder", "mn": "dá pra"}, {"cyr": "хотеть", "tr": "khatyét", "pt": "querer", "mn": "eu quero"}, {"cyr": "знать", "tr": "znat", "pt": "saber", "mn": "know"}, {"cyr": "думать", "tr": "dúmat", "pt": "pensar", "mn": "medita"}, {"cyr": "говорить", "tr": "gavarít", "pt": "falar", "mn": "gaba, fala"}, {"cyr": "сказать", "tr": "skazát", "pt": "dizer", "mn": "conta algo"}, {"cyr": "делать", "tr": "dyélat", "pt": "fazer", "mn": "põe a mão"}, {"cyr": "идти", "tr": "ittí", "pt": "ir (a pé)", "mn": "vai andando"}, {"cyr": "ходить", "tr": "khadít", "pt": "andar/ir", "mn": "caminha"}, {"cyr": "видеть", "tr": "vídit", "pt": "ver", "mn": "enxerga"}, {"cyr": "смотреть", "tr": "smatryét", "pt": "olhar/assistir", "mn": "observa"}, {"cyr": "слышать", "tr": "slýshat", "pt": "ouvir", "mn": "escuta"}, {"cyr": "дать", "tr": "dat", "pt": "dar", "mn": "entrega"}, {"cyr": "взять", "tr": "vzyat", "pt": "pegar", "mn": "toma pra si"}, {"cyr": "найти", "tr": "naytí", "pt": "achar", "mn": "encontra"}, {"cyr": "жить", "tr": "zhit", "pt": "viver/morar", "mn": "tem vida"}, {"cyr": "понимать", "tr": "panimát", "pt": "entender", "mn": "põe na mente"}, {"cyr": "любить", "tr": "lyubít", "pt": "amar/gostar", "mn": "ama"}, {"cyr": "работать", "tr": "rabótat", "pt": "trabalhar", "mn": "robô trabalha"}, {"cyr": "есть", "tr": "yest", "pt": "comer/haver", "mn": "come/há"}, {"cyr": "пить", "tr": "pit", "pt": "beber", "mn": "bebe"}, {"cyr": "спать", "tr": "spat", "pt": "dormir", "mn": "cochila"}, {"cyr": "читать", "tr": "chitát", "pt": "ler", "mn": "lê o texto"}, {"cyr": "писать", "tr": "pisát", "pt": "escrever", "mn": "escreve"}, {"cyr": "слушать", "tr": "slúshat", "pt": "escutar", "mn": "presta atenção"}, {"cyr": "играть", "tr": "igrát", "pt": "jogar/brincar", "mn": "joga a partida"}, {"cyr": "помогать", "tr": "pamagát", "pt": "ajudar", "mn": "dá uma mão"}, {"cyr": "ждать", "tr": "zhdat", "pt": "esperar", "mn": "aguarda"}, {"cyr": "начать", "tr": "nachát", "pt": "começar", "mn": "dá início"}, {"cyr": "купить", "tr": "kupít", "pt": "comprar", "mn": "leva pra casa"}, {"cyr": "платить", "tr": "platít", "pt": "pagar", "mn": "quita a conta"}, {"cyr": "стоить", "tr": "stóit", "pt": "custar", "mn": "tem preço"}, {"cyr": "открыть", "tr": "atkrýt", "pt": "abrir", "mn": "abre a porta"}, {"cyr": "закрыть", "tr": "zakrýt", "pt": "fechar", "mn": "fecha"}, {"cyr": "спросить", "tr": "sprasít", "pt": "perguntar", "mn": "faz a pergunta"}, {"cyr": "отвечать", "tr": "atvichát", "pt": "responder", "mn": "dá a resposta"}, {"cyr": "звонить", "tr": "zvanít", "pt": "telefonar", "mn": "liga pra alguém"}, {"cyr": "встречать", "tr": "fstrichát", "pt": "encontrar", "mn": "topa com"}, {"cyr": "показать", "tr": "pakazát", "pt": "mostrar", "mn": "exibe"}, {"cyr": "человек", "tr": "chilavyék", "pt": "pessoa", "mn": "um humano"}, {"cyr": "люди", "tr": "lyúdi", "pt": "pessoas", "mn": "a galera"}, {"cyr": "друг", "tr": "druk", "pt": "amigo", "mn": "brother"}, {"cyr": "время", "tr": "vryémya", "pt": "tempo", "mn": "as horas correm"}, {"cyr": "день", "tr": "dyen", "pt": "dia", "mn": "o dia todo"}, {"cyr": "год", "tr": "got", "pt": "ano", "mn": "god=ano"}, {"cyr": "час", "tr": "chas", "pt": "hora", "mn": "chá na hora"}, {"cyr": "минута", "tr": "minúta", "pt": "minuto", "mn": "minuto"}, {"cyr": "неделя", "tr": "nidyélya", "pt": "semana", "mn": "7 dias"}, {"cyr": "месяц", "tr": "myésyats", "pt": "mês", "mn": "o mês"}, {"cyr": "утро", "tr": "útra", "pt": "manhã", "mn": "cedinho"}, {"cyr": "вечер", "tr": "vyécher", "pt": "tarde/noite", "mn": "fim do dia"}, {"cyr": "ночь", "tr": "noch", "pt": "noite", "mn": "escuridão"}, {"cyr": "жизнь", "tr": "zhizn", "pt": "vida", "mn": "a vida"}, {"cyr": "мир", "tr": "mir", "pt": "mundo/paz", "mn": "o mundo"}, {"cyr": "дело", "tr": "dyéla", "pt": "assunto/negócio", "mn": "o lance"}, {"cyr": "вопрос", "tr": "vaprós", "pt": "pergunta", "mn": "a dúvida"}, {"cyr": "ответ", "tr": "atvyét", "pt": "resposta", "mn": "a solução"}, {"cyr": "имя", "tr": "ímya", "pt": "nome", "mn": "o nome"}, {"cyr": "слово", "tr": "slóva", "pt": "palavra", "mn": "uma palavra"}, {"cyr": "дом", "tr": "dom", "pt": "casa", "mn": "o lar"}, {"cyr": "квартира", "tr": "kvartíra", "pt": "apartamento", "mn": "o apê"}, {"cyr": "комната", "tr": "kómnata", "pt": "quarto/cômodo", "mn": "o quarto"}, {"cyr": "улица", "tr": "úlitsa", "pt": "rua", "mn": "a rua"}, {"cyr": "город", "tr": "górat", "pt": "cidade", "mn": "a cidade"}, {"cyr": "страна", "tr": "straná", "pt": "país", "mn": "a nação"}, {"cyr": "место", "tr": "myésta", "pt": "lugar", "mn": "um ponto"}, {"cyr": "магазин", "tr": "magazín", "pt": "loja", "mn": "o magazém"}, {"cyr": "рынок", "tr": "rýnak", "pt": "mercado", "mn": "a feira"}, {"cyr": "ресторан", "tr": "ristarán", "pt": "restaurante", "mn": "restaurante"}, {"cyr": "кафе", "tr": "kafé", "pt": "café", "mn": "o café"}, {"cyr": "банк", "tr": "bank", "pt": "banco", "mn": "o banco"}, {"cyr": "почта", "tr": "póchta", "pt": "correio", "mn": "cartas"}, {"cyr": "школа", "tr": "shkóla", "pt": "escola", "mn": "a escola"}, {"cyr": "работа", "tr": "rabóta", "pt": "trabalho", "mn": "o serviço"}, {"cyr": "офис", "tr": "ófis", "pt": "escritório", "mn": "office"}, {"cyr": "аэропорт", "tr": "aeropórt", "pt": "aeroporto", "mn": "voos"}, {"cyr": "вокзал", "tr": "vagzál", "pt": "estação", "mn": "trens"}, {"cyr": "дорога", "tr": "daróga", "pt": "estrada", "mn": "o caminho"}, {"cyr": "мост", "tr": "most", "pt": "ponte", "mn": "atravessa"}, {"cyr": "стол", "tr": "stol", "pt": "mesa", "mn": "a mesa"}, {"cyr": "стул", "tr": "stul", "pt": "cadeira", "mn": "a cadeira"}, {"cyr": "дверь", "tr": "dvyer", "pt": "porta", "mn": "abre/fecha"}, {"cyr": "окно", "tr": "aknó", "pt": "janela", "mn": "vê a rua"}, {"cyr": "ключ", "tr": "klyuch", "pt": "chave", "mn": "abre a porta"}, {"cyr": "телефон", "tr": "tilifón", "pt": "telefone", "mn": "o fone"}, {"cyr": "деньги", "tr": "dyéngi", "pt": "dinheiro", "mn": "a grana"}, {"cyr": "сумка", "tr": "súmka", "pt": "bolsa", "mn": "carrega"}, {"cyr": "книга", "tr": "kníga", "pt": "livro", "mn": "pra ler"}, {"cyr": "ручка", "tr": "rúchka", "pt": "caneta", "mn": "escreve"}, {"cyr": "бумага", "tr": "bumága", "pt": "papel", "mn": "folha"}, {"cyr": "компьютер", "tr": "kampyútir", "pt": "computador", "mn": "o PC"}, {"cyr": "машина", "tr": "mashýna", "pt": "carro", "mn": "dirige"}, {"cyr": "часы", "tr": "chisý", "pt": "relógio", "mn": "marca a hora"}, {"cyr": "одежда", "tr": "adyézhda", "pt": "roupa", "mn": "veste"}, {"cyr": "обувь", "tr": "óbuv", "pt": "calçado", "mn": "nos pés"}, {"cyr": "свет", "tr": "svyet", "pt": "luz", "mn": "clareia"}, {"cyr": "стена", "tr": "stiná", "pt": "parede", "mn": "o muro"}, {"cyr": "пол", "tr": "pol", "pt": "chão", "mn": "o piso"}, {"cyr": "кровать", "tr": "kravát", "pt": "cama", "mn": "pra dormir"}, {"cyr": "большой", "tr": "balshóy", "pt": "grande", "mn": "enorme"}, {"cyr": "маленький", "tr": "málinky", "pt": "pequeno", "mn": "mini"}, {"cyr": "новый", "tr": "nóvy", "pt": "novo", "mn": "recém"}, {"cyr": "старый", "tr": "stáry", "pt": "velho", "mn": "antigo"}, {"cyr": "хороший", "tr": "kharóshy", "pt": "bom", "mn": "ótimo"}, {"cyr": "плохой", "tr": "plakhóy", "pt": "ruim", "mn": "péssimo"}, {"cyr": "красивый", "tr": "krasívy", "pt": "bonito", "mn": "belo"}, {"cyr": "молодой", "tr": "maladóy", "pt": "jovem", "mn": "novo de idade"}, {"cyr": "длинный", "tr": "dlíny", "pt": "comprido", "mn": "longo"}, {"cyr": "короткий", "tr": "karótky", "pt": "curto", "mn": "curtinho"}, {"cyr": "высокий", "tr": "vysóky", "pt": "alto", "mn": "lá em cima"}, {"cyr": "низкий", "tr": "nízky", "pt": "baixo", "mn": "rente ao chão"}, {"cyr": "быстрый", "tr": "býstry", "pt": "rápido", "mn": "veloz"}, {"cyr": "медленный", "tr": "myédliny", "pt": "lento", "mn": "devagar"}, {"cyr": "лёгкий", "tr": "lyókhky", "pt": "fácil/leve", "mn": "leve"}, {"cyr": "трудный", "tr": "trúdny", "pt": "difícil", "mn": "árduo"}, {"cyr": "важный", "tr": "vázhny", "pt": "importante", "mn": "crucial"}, {"cyr": "разный", "tr": "rázny", "pt": "diferente", "mn": "variado"}, {"cyr": "сильный", "tr": "sílny", "pt": "forte", "mn": "potente"}, {"cyr": "слабый", "tr": "sláby", "pt": "fraco", "mn": "fragil"}, {"cyr": "горячий", "tr": "garyáchy", "pt": "quente (objeto)", "mn": "escaldante"}, {"cyr": "холодный", "tr": "khalódny", "pt": "frio", "mn": "gelado"}, {"cyr": "тёплый", "tr": "tyóply", "pt": "morno", "mn": "aconchego"}, {"cyr": "чистый", "tr": "chísty", "pt": "limpo", "mn": "limpinho"}, {"cyr": "грязный", "tr": "gryázny", "pt": "sujo", "mn": "imundo"}, {"cyr": "полный", "tr": "pólny", "pt": "cheio", "mn": "lotado"}, {"cyr": "пустой", "tr": "pustóy", "pt": "vazio", "mn": "nada dentro"}, {"cyr": "правильный", "tr": "právilny", "pt": "correto", "mn": "certinho"}, {"cyr": "свободный", "tr": "svabódny", "pt": "livre", "mn": "liberado"}, {"cyr": "занятый", "tr": "zányaty", "pt": "ocupado", "mn": "atarefado"}, {"cyr": "готовый", "tr": "gatóvy", "pt": "pronto", "mn": "tá pronto"}, {"cyr": "счастливый", "tr": "schaslívy", "pt": "feliz", "mn": "felizão"}, {"cyr": "весёлый", "tr": "visyóly", "pt": "alegre", "mn": "animado"}, {"cyr": "грустный", "tr": "grúsny", "pt": "triste", "mn": "cabisbaixo"}, {"cyr": "добрый", "tr": "dóbry", "pt": "bondoso", "mn": "gente boa"}, {"cyr": "злой", "tr": "zloy", "pt": "bravo/mau", "mn": "furioso"}, {"cyr": "дорогой", "tr": "daragóy", "pt": "caro/querido", "mn": "valioso"}, {"cyr": "дешёвый", "tr": "dishóvy", "pt": "barato", "mn": "em conta"}, {"cyr": "тёмный", "tr": "tyómny", "pt": "escuro", "mn": "na sombra"}, {"cyr": "светлый", "tr": "svyétly", "pt": "claro", "mn": "iluminado"}, {"cyr": "кстати", "tr": "kstáti", "pt": "aliás", "mn": "por sinal"}, {"cyr": "может быть", "tr": "mózhet byt", "pt": "talvez", "mn": "quem sabe"}, {"cyr": "вообще", "tr": "vabschyé", "pt": "em geral", "mn": "no geral"}, {"cyr": "обычно", "tr": "abýchna", "pt": "normalmente", "mn": "de costume"}, {"cyr": "особенно", "tr": "asóbina", "pt": "especialmente", "mn": "sobretudo"}, {"cyr": "почти", "tr": "pachtí", "pt": "quase", "mn": "por pouco"}, {"cyr": "совсем", "tr": "safsyém", "pt": "completamente", "mn": "de todo"}, {"cyr": "слишком", "tr": "slíshkam", "pt": "demais", "mn": "excesso"}, {"cyr": "достаточно", "tr": "dastátachna", "pt": "suficiente", "mn": "o bastante"}, {"cyr": "несколько", "tr": "nyéskalka", "pt": "alguns", "mn": "uns poucos"}, {"cyr": "вдруг", "tr": "vdruk", "pt": "de repente", "mn": "do nada"}, {"cyr": "опять", "tr": "apyát", "pt": "de novo", "mn": "mais uma vez"}, {"cyr": "сразу", "tr": "srázu", "pt": "imediatamente", "mn": "na hora"}, {"cyr": "рядом", "tr": "ryádam", "pt": "ao lado", "mn": "pertinho"}, {"cyr": "вперёд", "tr": "vpiryót", "pt": "para frente", "mn": "avante"}, {"cyr": "назад", "tr": "nazát", "pt": "para trás", "mn": "de volta"}, {"cyr": "внизу", "tr": "vnizú", "pt": "embaixo", "mn": "lá em baixo"}, {"cyr": "наверху", "tr": "navirkhú", "pt": "em cima", "mn": "lá no alto"}, {"cyr": "вместо", "tr": "vmésta", "pt": "em vez de", "mn": "no lugar de"}, {"cyr": "через", "tr": "chéris", "pt": "através/depois de", "mn": "dali a"}];
+var DAILY = [];
+function ensureDaily(){
+  if(!state.dailyDays) state.dailyDays=[];
+  if(state.dailyStart==null) state.dailyStart=0;
+  var today=todayStr();
+  if(state.lastDailyDate!==today && state.dailyStart < WORDBANK.length){
+    var start=state.dailyStart, slice=WORDBANK.slice(start, start+20);
+    if(slice.length){
+      state.dailyDays.unshift({dia: state.dailyDays.length+1, data: today, start:start, n:slice.length});
+      state.dailyStart = start + slice.length;
+      state.lastDailyDate = today;
+      save();
+    }
+  }
+  DAILY = (state.dailyDays||[]).map(function(d){ return {dia:d.dia, data:d.data, words: WORDBANK.slice(d.start, d.start+d.n)}; });
+}
+function renderResourcesSection(map){
+  const h=document.createElement('h2'); h.className='section'; h.textContent='📚 Recursos de estudo';
+  map.appendChild(h);
+  const sub=document.createElement('p'); sub.className='unit-sub'; sub.textContent='Gramática, seu cronograma e as palavras novas do dia — tudo aqui.';
+  map.appendChild(sub);
+  const grid=document.createElement('div'); grid.className='levels';
+  const items=[
+    {t:'Gramática Essencial', ru:'Грамматика', e:'🔑', meta:GRAMMAR.length+' tópicos', fn:'openGram()'},
+    {t:'Cronograma de Estudos', ru:'План', e:'🗓️', meta:'12 semanas', fn:'openCrono()'},
+    {t:'Palavras do Dia', ru:'Слова дня', e:'🆕', meta:DAILY.reduce(function(a,d){return a+d.words.length;},0)+' palavras', fn:'openPal()'},
+    {t:'Exercícios', ru:'Упражнения', e:'🎯', meta:'treino misto', fn:'openExercicios()'}
+  ];
+  items.forEach(function(it){
+    const d=document.createElement('div'); d.className='lvl';
+    d.innerHTML='<div class="num">'+it.e+' · Recurso</div><div class="t">'+it.t+'</div><div class="ru">'+it.ru+'</div><div class="bar"><i style="width:0"></i></div><div class="meta"><span>'+it.meta+'</span><span>abrir →</span></div>';
+    d.setAttribute('onclick', it.fn);
+    grid.appendChild(d);
+  });
+  map.appendChild(grid);
+}
+/* --- Gramática --- */
+function openGram(){ document.getElementById('gramScreen').classList.add('open'); renderGramList(); window.scrollTo(0,0); }
+function closeGram(){ speechSynthesis.cancel(); document.getElementById('gramScreen').classList.remove('open'); }
+function renderGramList(){
+  var html='<div class="levels">';
+  GRAMMAR.forEach(function(g,i){ html+='<div class="lvl" onclick="openGramTopic('+i+')"><div class="num">'+g.emoji+' · TÓPICO '+(i+1)+'</div><div class="t">'+g.t+'</div><div class="ru">'+g.ru+'</div><div class="meta"><span>ler →</span></div></div>'; });
+  html+='</div>';
+  document.getElementById('gramBox').innerHTML=html;
+}
+function openGramTopic(i){
+  var g=GRAMMAR[i];
+  var html='<button class="btn ghost" onclick="renderGramList()" style="margin-bottom:14px">← Tópicos</button>';
+  html+='<h2 style="color:var(--ru);margin:4px 0 2px;font-size:20px">'+g.t+'</h2><div class="ru" style="color:var(--ru);margin-bottom:14px">'+g.ru+'</div>';
+  g.blocks.forEach(function(b){
+    if(b.type==='p'){ html+='<p style="font-size:15px;line-height:1.65;margin:10px 2px;color:var(--ink)">'+b.text+'</p>'; }
+    else { html+='<div class="wcard"><div class="body"><div class="cyr" style="font-size:20px">'+b.cyr+'</div><div class="tr">['+b.tr+']</div><div class="pt">'+b.pt+'</div></div><div class="speak" data-cyr="'+b.cyr+'">🔊</div></div>'; }
+  });
+  var box=document.getElementById('gramBox'); box.innerHTML=html;
+  box.querySelectorAll('.speak[data-cyr]').forEach(function(el){ el.onclick=function(){ speak(el.getAttribute('data-cyr'),el); }; });
+  window.scrollTo(0,0);
+}
+/* --- Cronograma --- */
+function openCrono(){ document.getElementById('cronoBox').innerHTML=CRONO_HTML; document.getElementById('cronoScreen').classList.add('open'); window.scrollTo(0,0); }
+function closeCrono(){ document.getElementById('cronoScreen').classList.remove('open'); }
+/* --- Palavras do Dia --- */
+function openPal(){ renderPal(); document.getElementById('palScreen').classList.add('open'); window.scrollTo(0,0); }
+function closePal(){ speechSynthesis.cancel(); document.getElementById('palScreen').classList.remove('open'); }
+function renderPal(){
+  var box=document.getElementById('palBox'); var html='';
+  if(!DAILY.length){ html='<p class="unit-sub">As 20 palavras do dia aparecerão aqui a cada manhã.</p>'; }
+  DAILY.forEach(function(d){
+    html+='<h3 style="color:var(--ru);margin:18px 2px 8px">🗓️ Dia '+d.dia+' · '+d.data+'</h3>';
+    d.words.forEach(function(w){ html+='<div class="wcard"><div class="body"><div class="cyr" style="font-size:22px">'+w.cyr+'</div><div class="tr">['+w.tr+']</div><div class="pt">'+w.pt+'</div>'+(w.mn?'<div class="mn">💡 '+w.mn+'</div>':'')+'</div><div class="speak" data-cyr="'+w.cyr+'">🔊</div></div>'; });
+  });
+  box.innerHTML=html;
+  box.querySelectorAll('.speak[data-cyr]').forEach(function(el){ el.onclick=function(){ speak(el.getAttribute('data-cyr'),el); }; });
+}
+
+/* ============================================================
+   EXERCÍCIOS — Treino misto (associação de conhecimentos)
+   ============================================================ */
+function exPool(){
+  var seen={}, pool=[];
+  LEVELS.forEach(function(l){ l.words.forEach(function(w){ if(!seen[w.cyr]){ seen[w.cyr]=1; pool.push({cyr:w.cyr,tr:w.tr,pt:w.pt}); } }); });
+  if(typeof DAILY!=='undefined') DAILY.forEach(function(d){ d.words.forEach(function(w){ if(!seen[w.cyr]){ seen[w.cyr]=1; pool.push({cyr:w.cyr,tr:w.tr,pt:w.pt}); } }); });
+  return pool;
+}
+function exSentences(){
+  var arr=[];
+  LEVELS.forEach(function(l){ if(l.examples) l.examples.forEach(function(e){ arr.push(e); }); });
+  if(typeof READTEXTS!=='undefined') READTEXTS.forEach(function(t){ t.sentences.forEach(function(s){ arr.push(s); }); });
+  return arr;
+}
+var exQ=[], exI=0, exScore=0;
+function openExercicios(){ document.getElementById('exScreen').classList.add('open'); exHome(); window.scrollTo(0,0); }
+function closeEx(){ speechSynthesis.cancel(); document.getElementById('exScreen').classList.remove('open'); renderMap(); }
+function exHome(){
+  document.getElementById('exBox').innerHTML='<div class="quizbox"><div class="big" style="font-size:46px">🎯</div><h3>Treino misto</h3><p class="sub">Exercícios que misturam TODO o vocabulário e as frases que você já viu: significado, escolher o russo, escutar e completar frases. Ótimo para associar tudo.</p><button class="btn primary wide" onclick="startEx(10)">Treino rápido — 10 questões</button><button class="btn good wide" style="margin-top:8px" onclick="startEx(20)">Treino completo — 20 questões</button></div>';
+}
+function startEx(n){
+  var pool=exPool(), sents=exSentences();
+  exQ=[]; for(var i=0;i<n;i++){ exQ.push(makeQ(pool,sents)); }
+  exI=0; exScore=0; renderEx();
+}
+function makeQ(pool,sents){
+  var canGap = sents.length>0;
+  var r=Math.random();
+  if(canGap && r<0.28) return makeGap(pool,sents);
+  var t = r<0.45?'meaning':(r<0.7?'reverse':'listen');
+  var it=pool[Math.floor(Math.random()*pool.length)];
+  var others=shuffle(pool.filter(function(x){return x.cyr!==it.cyr && x.pt!==it.pt;}));
+  if(t==='meaning'){
+    var o1=shuffle([{label:it.pt,ok:true}].concat(others.slice(0,3).map(function(x){return {label:x.pt,ok:false};})));
+    return {sub:'O que significa? (toque 🔊 para ouvir)', prompt:'<div class="prompt">'+it.cyr+'</div>', play:it.cyr, options:o1};
+  }
+  if(t==='reverse'){
+    var o2=shuffle([{label:it.cyr,ok:true}].concat(others.slice(0,3).map(function(x){return {label:x.cyr,ok:false};})));
+    return {sub:'Qual é em russo?', prompt:'<div class="prompt" style="color:var(--ink);font-size:22px">'+it.pt+'</div>', options:o2, cyr:true};
+  }
+  var o3=shuffle([{label:it.cyr,ok:true}].concat(others.slice(0,3).map(function(x){return {label:x.cyr,ok:false};})));
+  return {sub:'Escute e escolha a palavra que ouviu', prompt:'', play:it.cyr, autoplay:true, options:o3, cyr:true};
+}
+function makeGap(pool,sents){
+  var s=sents[Math.floor(Math.random()*sents.length)];
+  var toks=s.cyr.split(' ');
+  var idxs=[]; toks.forEach(function(tk,i){ if(tk.replace(/[.,!?;:]/g,'').length>2) idxs.push(i); });
+  if(!idxs.length) return makeQ(pool,[]);
+  var gi=idxs[Math.floor(Math.random()*idxs.length)];
+  var answer=toks[gi].replace(/[.,!?;:]/g,'');
+  var disp=toks.slice(); disp[gi]='<b style="color:var(--warn)">_____</b>';
+  var poolToks=shuffle(pool.map(function(x){return x.cyr.split(' ')[0].replace(/[.,!?;:]/g,'');}).filter(function(x){return x.length>2 && x.toLowerCase()!==answer.toLowerCase();}));
+  var distr=[]; for(var i=0;i<poolToks.length && distr.length<3;i++){ if(distr.indexOf(poolToks[i])<0) distr.push(poolToks[i]); }
+  var opts=shuffle([{label:answer,ok:true}].concat(distr.map(function(x){return {label:x,ok:false};})));
+  return {sub:'Complete a frase — '+s.pt, prompt:'<div class="prompt" style="font-size:18px;line-height:1.55">'+disp.join(' ')+'</div>', play:s.cyr, options:opts, cyr:true};
+}
+function renderEx(){
+  var p=document.getElementById('exBox');
+  if(exI>=exQ.length){
+    var pct=Math.round(exScore/exQ.length*100);
+    p.innerHTML='<div class="quizbox"><div class="big" style="font-size:50px">'+(pct>=70?'🏆':'💪')+'</div><h3>Treino concluído!</h3><p class="sub">Acertos: '+exScore+'/'+exQ.length+' ('+pct+'%)</p><button class="btn primary wide" onclick="startEx('+exQ.length+')">Novo treino 🔁</button><button class="btn ghost wide" style="margin-top:8px" onclick="exHome()">Escolher outro</button></div>';
+    if(exScore>0){ addXP(exScore*2); }
+    return;
+  }
+  var q=exQ[exI];
+  var html='<div class="progressline"><i style="width:'+(exI/exQ.length*100)+'%"></i></div><div class="quizbox"><p class="sub">'+q.sub+'</p>'+(q.prompt||'');
+  if(q.play) html+='<div style="margin:10px 0"><button class="speak" id="exReplay" style="margin:0 auto;width:64px;height:64px;font-size:26px">🔊</button></div>';
+  html+='<div class="opts" id="exOpts"></div></div>';
+  p.innerHTML=html;
+  if(q.play){ var rb=document.getElementById('exReplay'); rb.onclick=function(){ speak(q.play,rb); }; if(q.autoplay) speak(q.play,rb); }
+  var box=document.getElementById('exOpts');
+  q.options.forEach(function(o,ix){
+    var b=document.createElement('div'); b.className='opt';
+    if(q.cyr) b.innerHTML='<span style="color:var(--ru);font-weight:800">'+o.label+'</span>'; else b.textContent=o.label;
+    b.onclick=function(){
+      if(o.ok){ b.classList.add('correct'); exScore++; toast('Certo! ✅','good'); anchorSuccess(); }
+      else{ b.classList.add('wrong'); toast('Ops! Veja a correta.','bad');
+        var kids=box.children; for(var k=0;k<kids.length;k++){ if(q.options[k] && q.options[k].ok) kids[k].classList.add('correct'); } }
+      var all=box.querySelectorAll('.opt'); all.forEach(function(x){ x.onclick=null; });
+      setTimeout(function(){ exI++; renderEx(); }, 950);
+    };
+    box.appendChild(b);
+  });
 }
 
 /* ============================================================
